@@ -1,10 +1,11 @@
-import { Contract } from "ethers";
+import { Contract, Signer } from "ethers";
 import { ethers } from "hardhat";
 //@ts-ignore
 import { describe, it, before } from "mocha";
 import { deployDiamond } from "../scripts/deploy";
 import { getSelectors } from "../scripts/libraries/diamond";
 import { expect } from "chai";
+import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 
 const { assert } = require("chai");
 
@@ -37,7 +38,7 @@ describe("DiamondTest", async function () {
       addresses.push(address);
     }
 
-    assert.equal(addresses.length, 6);
+    assert.equal(addresses.length, 7);
   });
 
   it("facets should have the right function selectors -- call to facetFunctionSelectors function", async () => {
@@ -79,7 +80,7 @@ describe("DiamondTest", async function () {
 
   it("should return the correct facets for the diamond", async () => {
     const facets = await diamondLoupeFacet.facets();
-    expect(facets.length).to.equal(6);
+    expect(facets.length).to.equal(7);
     // You can add more specific checks for each facet if needed
   });
 });
@@ -385,5 +386,178 @@ describe("GamesFacet", async function () {
     )
       .to.emit(gamesFacet, "GameUpdated")
       .withArgs(0, updatedTitle, updatedPublisher);
+  });
+});
+
+describe("BadgeFacet", async function () {
+  let badgeFacet: Contract;
+  let owner: Signer;
+  let user: Signer;
+
+  before(async function () {
+    const addresses = await ethers.getSigners();
+
+    //@ts-ignore
+    owner = addresses[0];
+
+    //@ts-ignore
+    user = addresses[1];
+    badgeFacet = await ethers.getContractAt("BadgeFacet", diamondAddress);
+  });
+
+  it("should add a badge", async function () {
+    const rarity = 1;
+    const gameId = 0;
+    const gameTitle = "Test Game";
+    const title = "Test Badge";
+    const description = "Test Description";
+
+    await expect(
+      badgeFacet
+        .connect(owner)
+        .addBadge(rarity, gameId, gameTitle, title, description)
+    )
+      .to.emit(badgeFacet, "BadgeAdded")
+      .withArgs(0, rarity, gameId, gameTitle, title, description);
+
+    const badges = await badgeFacet.getBadges([0]);
+    expect(badges[0].rarity).to.equal(rarity);
+    expect(badges[0].gameId).to.equal(gameId);
+    expect(badges[0].title).to.equal(title);
+    expect(badges[0].description).to.equal(description);
+  });
+
+  it("should update a badge", async function () {
+    const badgeId = 0;
+    const newRarity = 2;
+    const newGameId = 1;
+    const newGameTitle = "Updated Game";
+    const newTitle = "Updated Badge";
+    const newDescription = "Updated Description";
+
+    await expect(
+      badgeFacet
+        .connect(owner)
+        .updateBadge(
+          badgeId,
+          newRarity,
+          newGameId,
+          newGameTitle,
+          newTitle,
+          newDescription
+        )
+    )
+      .to.emit(badgeFacet, "BadgeUpdated")
+      .withArgs(
+        badgeId,
+        newRarity,
+        newGameId,
+        newGameTitle,
+        newTitle,
+        newDescription
+      );
+
+    const badges = await badgeFacet.getBadges([badgeId]);
+    expect(badges[0].rarity).to.equal(newRarity);
+    expect(badges[0].gameId).to.equal(newGameId);
+    expect(badges[0].title).to.equal(newTitle);
+    expect(badges[0].description).to.equal(newDescription);
+  });
+
+  it("should batch add badges", async function () {
+    const rarities = [1, 2, 3];
+    const gameIds = [0, 1, 2];
+    const gameTitles = ["Game 1", "Game 2", "Game 3"];
+    const titles = ["Badge 1", "Badge 2", "Badge 3"];
+    const descriptions = ["Desc 1", "Desc 2", "Desc 3"];
+
+    const tx = await badgeFacet
+      .connect(owner)
+      .batchAddBadges(rarities, gameIds, gameTitles, titles, descriptions);
+    const receipt = await tx.wait();
+
+    expect(
+      receipt.events?.filter((e: any) => e.event === "BadgeAdded")
+    ).to.have.length(3);
+
+    const badges = await badgeFacet.getBadges([1, 2, 3]);
+    expect(badges).to.have.length(3);
+    for (let i = 0; i < 3; i++) {
+      expect(badges[i].rarity).to.equal(rarities[i]);
+      expect(badges[i].gameId).to.equal(gameIds[i]);
+      expect(badges[i].title).to.equal(titles[i]);
+      expect(badges[i].description).to.equal(descriptions[i]);
+    }
+  });
+
+  it("should mint a badge", async function () {
+    const badgeId = 0;
+    await expect(
+      badgeFacet.connect(owner).mintBadge(await user.getAddress(), badgeId)
+    )
+      .to.emit(badgeFacet, "BadgeMinted")
+      .withArgs(await user.getAddress(), badgeId);
+
+    const balance = await badgeFacet.balanceOf(
+      await user.getAddress(),
+      badgeId
+    );
+    expect(balance).to.equal(1);
+  });
+
+  it("should not allow minting a badge twice", async function () {
+    const badgeId = 0;
+    await expect(
+      badgeFacet.connect(owner).mintBadge(await user.getAddress(), badgeId)
+    ).to.be.revertedWith("User already owns this badge");
+  });
+
+  it("should batch mint badges", async function () {
+    const users = [await user.getAddress(), await owner.getAddress()];
+    const badgeIds = [1, 2];
+
+    await badgeFacet.connect(owner).batchMintBadges(users, badgeIds);
+
+    for (let i = 0; i < users.length; i++) {
+      const balance = await badgeFacet.balanceOf(users[i], badgeIds[i]);
+      expect(balance).to.equal(1);
+    }
+  });
+
+  it("should admin transfer badges", async function () {
+    const badgeIds = [1];
+    await badgeFacet
+      .connect(owner)
+      .adminTransferBadges(
+        await user.getAddress(),
+        await owner.getAddress(),
+        badgeIds
+      );
+
+    const userBalance = await badgeFacet.balanceOf(
+      await user.getAddress(),
+      badgeIds[0]
+    );
+    const ownerBalance = await badgeFacet.balanceOf(
+      await owner.getAddress(),
+      badgeIds[0]
+    );
+
+    expect(userBalance).to.equal(0);
+    expect(ownerBalance).to.equal(1);
+  });
+
+  it("should get all badges when no ids are provided", async function () {
+    const badges = await badgeFacet.getBadges([]);
+    expect(badges.length).to.be.greaterThan(0);
+  });
+
+  it("should get specific badges when ids are provided", async function () {
+    const badgeIds = [0, 1, 2];
+    const badges = await badgeFacet.getBadges(badgeIds);
+    expect(badges.length).to.equal(badgeIds.length);
+    for (let i = 0; i < badges.length; i++) {
+      expect(badges[i].id).to.equal(badgeIds[i]);
+    }
   });
 });

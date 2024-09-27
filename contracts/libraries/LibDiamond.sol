@@ -33,6 +33,15 @@ library LibDiamond {
         uint256 lastUpdated;
     }
 
+    struct Badge {
+        uint256 id;
+        uint256 rarity;
+        uint256 gameId;
+        string title;
+        string description;
+        uint256 earnedOn;
+    }
+
     struct DiamondStorage {
         // maps function selector to the facet address and
         // the position of the selector in the facetFunctionSelectors.selectors array
@@ -51,6 +60,7 @@ library LibDiamond {
         mapping(address => uint256) userToPoints;
         Game[] games;
         mapping(uint256 => Game) idToGame;
+        Badge[] badges;
     }
 
     function diamondStorage() internal pure returns (DiamondStorage storage ds) {

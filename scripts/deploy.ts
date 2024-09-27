@@ -40,17 +40,38 @@ export async function deployDiamond() {
     "PointsFacet",
     "AdminFacet",
     "GamesFacet",
+    "BadgeFacet",
   ];
   const cut = [];
+
+  const uniqueSelectors = new Set();
+
   for (const FacetName of FacetNames) {
+    const localSelectors = new Set();
+
     const Facet = await ethers.getContractFactory(FacetName);
     const facet = await Facet.deploy();
     await facet.deployed();
     console.log(`${FacetName} deployed: ${facet.address}`);
+
+    const selectors = getSelectors(facet);
+    for (const selector of selectors) {
+      if (uniqueSelectors.has(selector)) {
+        const functionName = facet.interface.getFunction(selector).name;
+
+        console.warn(
+          `Selector ${selector} (${functionName}) already in diamond`
+        );
+      } else {
+        uniqueSelectors.add(selector);
+        localSelectors.add(selector);
+      }
+    }
+
     cut.push({
       facetAddress: facet.address,
       action: FacetCutAction.Add,
-      functionSelectors: getSelectors(facet),
+      functionSelectors: Array.from(localSelectors),
     });
   }
 
