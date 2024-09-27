@@ -1,8 +1,6 @@
-/* global describe it before ethers */
-
 import { Contract } from "ethers";
 import { ethers } from "hardhat";
-// @ts-ignore
+//@ts-ignore
 import { describe, it, before } from "mocha";
 import { deployDiamond } from "../scripts/deploy";
 import { getSelectors } from "../scripts/libraries/diamond";
