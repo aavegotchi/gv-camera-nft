@@ -9,6 +9,7 @@ contract BadgeFacet is ERC1155, Modifiers {
     event BadgeAdded(uint256 indexed badgeId, uint256 rarity, uint256 gameId, string gameTitle, string title, string description);
     event BadgeUpdated(uint256 indexed badgeId, uint256 rarity, uint256 gameId, string gameTitle, string title, string description);
     event BadgeMinted(address indexed to, uint256 indexed badgeId);
+    event URISet(string newuri);
 
     constructor() ERC1155("") {}
 
@@ -144,5 +145,10 @@ contract BadgeFacet is ERC1155, Modifiers {
         }
 
         return requestedBadges;
+    }
+
+    function setURI(string memory newuri) external onlyContractOwner {
+        _setURI(newuri);
+        emit URISet(newuri);
     }
 }

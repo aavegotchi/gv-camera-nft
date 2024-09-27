@@ -6,6 +6,7 @@ import { deployDiamond } from "../scripts/deploy";
 import { getSelectors } from "../scripts/libraries/diamond";
 import { expect } from "chai";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
+import { BadgeFacet } from "../src/types";
 
 const { assert } = require("chai");
 
@@ -390,7 +391,7 @@ describe("GamesFacet", async function () {
 });
 
 describe("BadgeFacet", async function () {
-  let badgeFacet: Contract;
+  let badgeFacet: BadgeFacet;
   let owner: Signer;
   let user: Signer;
 
@@ -559,5 +560,52 @@ describe("BadgeFacet", async function () {
     for (let i = 0; i < badges.length; i++) {
       expect(badges[i].id).to.equal(badgeIds[i]);
     }
+  });
+
+  it("should allow viewing multiple badges in a single get", async function () {
+    // First, ensure we have at least 3 badges to test with
+    const rarity = 1;
+    const gameId = 0;
+    const gameTitle = "Test Game";
+    const titles = ["Badge 1", "Badge 2", "Badge 3"];
+    const description = "Test Description";
+
+    for (let i = 0; i < 3; i++) {
+      await badgeFacet
+        .connect(owner)
+        .addBadge(rarity, gameId, gameTitle, titles[i], description);
+    }
+
+    // Now, get multiple badges in a single call
+    const badgeIds = [0, 1, 2];
+    const badges = await badgeFacet.getBadges(badgeIds);
+
+    // Verify the results
+    expect(badges.length).to.equal(badgeIds.length);
+  });
+
+  it("should be able to set metadata URL", async function () {
+    const newMetadataURL = "https://example.com/metadata/";
+
+    const uri = await badgeFacet.uri(0);
+    expect(uri).to.equal("");
+
+    // Set the new metadata URL
+    await expect(badgeFacet.connect(owner).setURI(newMetadataURL))
+      .to.emit(badgeFacet, "URISet")
+      .withArgs(newMetadataURL);
+
+    // Verify the new metadata URL
+    const updatedURI = await badgeFacet.uri(0);
+    expect(updatedURI).to.equal(newMetadataURL);
+  });
+
+  it("should not allow non-owner to set metadata URL", async function () {
+    const newMetadataURL = "https://example.com/unauthorized/";
+
+    // Attempt to set the new metadata URL as non-owner
+    await expect(
+      badgeFacet.connect(user).setURI(newMetadataURL)
+    ).to.be.revertedWith("LibDiamond: Must be contract owner");
   });
 });
