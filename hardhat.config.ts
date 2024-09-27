@@ -1,7 +1,6 @@
 /* global ethers task */
 import "@nomiclabs/hardhat-ethers";
 import "@nomicfoundation/hardhat-chai-matchers";
-// require("@nomicfoundation/hardhat-chai-matchers");
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
@@ -10,7 +9,7 @@ import "@nomicfoundation/hardhat-chai-matchers";
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: "0.8.6",
+  solidity: "0.8.27",
   settings: {
     optimizer: {
       enabled: true,

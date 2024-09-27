@@ -219,3 +219,10 @@ library LibDiamond {
         require(contractSize > 0, _errorMessage);
     }
 }
+
+contract Modifiers {
+    modifier onlyContractOwner() {
+        require(msg.sender == LibDiamond.contractOwner(), "LibDiamond: Must be contract owner");
+        _;
+    }
+}

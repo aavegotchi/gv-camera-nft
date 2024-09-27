@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.27;
 
-import {LibDiamond} from "../libraries/LibDiamond.sol";
+import {LibDiamond, Modifiers} from "../libraries/LibDiamond.sol";
 
-contract GamesFacet {
+contract GamesFacet is Modifiers {
     event GameRegistered(uint256 indexed gameId, string title, string publisher);
     event GameUpdated(uint256 indexed gameId, string title, string publisher);
 
-    function registerGame(string memory gameTitle, string memory gameDescription, string memory publisher) external {
+    function registerGame(string memory gameTitle, string memory gameDescription, string memory publisher) external onlyContractOwner {
         require(bytes(gameTitle).length > 0, "Game title cannot be empty");
-        LibDiamond.enforceIsContractOwner();
+        require(bytes(gameDescription).length > 0, "Game description cannot be empty");
+        require(bytes(publisher).length > 0, "Publisher cannot be empty");
 
         LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
         LibDiamond.Game[] storage games = ds.games;
@@ -21,9 +22,12 @@ contract GamesFacet {
         emit GameRegistered(gameId, gameTitle, publisher);
     }
 
-    function updateGame(uint256 _gameId, string memory _gameTitle, string memory _gameDescription, string memory _publisher) external {
-        LibDiamond.enforceIsContractOwner();
-
+    function updateGame(
+        uint256 _gameId,
+        string memory _gameTitle,
+        string memory _gameDescription,
+        string memory _publisher
+    ) external onlyContractOwner {
         LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
         LibDiamond.Game[] storage games = ds.games;
 

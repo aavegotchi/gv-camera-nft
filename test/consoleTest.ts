@@ -361,6 +361,18 @@ describe("GamesFacet", async function () {
     ).to.be.revertedWith("Game title cannot be empty");
   });
 
+  it("should not allow registering a game with empty description", async () => {
+    await expect(
+      gamesFacet.connect(owner).registerGame("Title", "", "Publisher")
+    ).to.be.revertedWith("Game description cannot be empty");
+  });
+
+  it("should not allow registering a game with empty publisher", async () => {
+    await expect(
+      gamesFacet.connect(owner).registerGame("Title", "Description", "")
+    ).to.be.revertedWith("Publisher cannot be empty");
+  });
+
   it("should emit GameUpdated event with correct parameters", async () => {
     const updatedTitle = "Another Update";
     const updatedDescription = "Another updated description";

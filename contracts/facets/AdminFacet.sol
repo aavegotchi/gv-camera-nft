@@ -1,20 +1,18 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.27;
 
-import {LibDiamond} from "../libraries/LibDiamond.sol";
+import {LibDiamond, Modifiers} from "../libraries/LibDiamond.sol";
 
-contract AdminFacet {
+contract AdminFacet is Modifiers {
     event AGCAdminStatusChanged(address indexed admin, bool isAdmin);
 
-    function setAGCAdmin(address _admin, bool _isAdmin) external {
-        LibDiamond.enforceIsContractOwner();
+    function setAGCAdmin(address _admin, bool _isAdmin) external onlyContractOwner {
         LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
         ds.agcAdmins[_admin] = _isAdmin;
         emit AGCAdminStatusChanged(_admin, _isAdmin);
     }
 
-    function setAGCAdminsBatch(address[] calldata _admins, bool[] calldata _isAdmins) external {
-        LibDiamond.enforceIsContractOwner();
+    function setAGCAdminsBatch(address[] calldata _admins, bool[] calldata _isAdmins) external onlyContractOwner {
         require(_admins.length == _isAdmins.length, "AdminFacet: Input arrays must have the same length");
 
         LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
