@@ -3,7 +3,9 @@
 pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts/utils/Base64.sol";
 import "../libraries/LibDiamond.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract BadgeFacet is ERC1155, Modifiers {
     event BadgeAdded(uint256 indexed badgeId, uint256 rarity, uint256 gameId, string gameTitle, string title, string description);
@@ -147,8 +149,37 @@ contract BadgeFacet is ERC1155, Modifiers {
         return requestedBadges;
     }
 
-    function setURI(string memory newuri) external onlyContractOwner {
-        _setURI(newuri);
-        emit URISet(newuri);
+    // Add this new function to generate the token URI
+    function uri(uint256 _tokenId) public view override returns (string memory) {
+        LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
+        require(_tokenId < ds.badges.length, "Badge does not exist");
+
+        LibDiamond.Badge memory badge = ds.badges[_tokenId];
+
+        return
+            string(
+                abi.encodePacked(
+                    "data:application/json;base64,",
+                    Base64.encode(
+                        bytes(
+                            abi.encodePacked(
+                                '{"name":"',
+                                badge.title,
+                                '", "description":"',
+                                badge.description,
+                                '", "attributes": [{"trait_type": "Rarity", "value": "',
+                                Strings.toString(badge.rarity),
+                                '"}, {"trait_type": "Game ID", "value": "',
+                                Strings.toString(badge.gameId),
+                                '"}], "id":"',
+                                Strings.toString(_tokenId),
+                                '", "image":"',
+                                string(abi.encodePacked("https://example.com/badge-images/", Strings.toString(_tokenId), ".png")),
+                                '"}'
+                            )
+                        )
+                    )
+                )
+            );
     }
 }

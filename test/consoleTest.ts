@@ -5,7 +5,6 @@ import { describe, it, before } from "mocha";
 import { deployDiamond } from "../scripts/deploy";
 import { getSelectors } from "../scripts/libraries/diamond";
 import { expect } from "chai";
-import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { BadgeFacet } from "../src/types";
 
 const { assert } = require("chai");
@@ -583,29 +582,45 @@ describe("BadgeFacet", async function () {
     // Verify the results
     expect(badges.length).to.equal(badgeIds.length);
   });
+  it("should render on-chain attributes properly", async function () {
+    // Add a new badge
+    const rarity = 2;
+    const gameId = 1;
+    const gameTitle = "Test Game";
+    const title = "Test Badge";
+    const description = "This is a test badge";
 
-  it("should be able to set metadata URL", async function () {
-    const newMetadataURL = "https://example.com/metadata/";
+    const tx = await badgeFacet
+      .connect(owner)
+      .addBadge(rarity, gameId, gameTitle, title, description);
+    const receipt = await tx.wait();
+    const badgeId = receipt?.events?.find((e: any) => e.event === "BadgeAdded")
+      ?.args?.badgeId;
 
-    const uri = await badgeFacet.uri(0);
-    expect(uri).to.equal("");
+    // Get the URI for the newly added badge
 
-    // Set the new metadata URL
-    await expect(badgeFacet.connect(owner).setURI(newMetadataURL))
-      .to.emit(badgeFacet, "URISet")
-      .withArgs(newMetadataURL);
+    const uri = await badgeFacet.uri(badgeId);
 
-    // Verify the new metadata URL
-    const updatedURI = await badgeFacet.uri(0);
-    expect(updatedURI).to.equal(newMetadataURL);
-  });
+    // Decode the base64 encoded JSON
+    const jsonString = Buffer.from(uri.split(",")[1], "base64").toString();
+    const metadata = JSON.parse(jsonString);
 
-  it("should not allow non-owner to set metadata URL", async function () {
-    const newMetadataURL = "https://example.com/unauthorized/";
+    // Check if the metadata contains the correct attributes
+    expect(metadata.name).to.equal(title);
+    expect(metadata.description).to.equal(description);
+    expect(metadata.attributes).to.deep.include({
+      trait_type: "Rarity",
+      value: rarity.toString(),
+    });
+    expect(metadata.attributes).to.deep.include({
+      trait_type: "Game ID",
+      value: gameId.toString(),
+    });
+    expect(metadata["id"]).to.equal(badgeId.toString());
 
-    // Attempt to set the new metadata URL as non-owner
-    await expect(
-      badgeFacet.connect(user).setURI(newMetadataURL)
-    ).to.be.revertedWith("LibDiamond: Must be contract owner");
+    // Check if the image URL is correctly formed
+    expect(metadata.image).to.equal(
+      `https://example.com/badge-images/${badgeId}.png`
+    );
   });
 });
