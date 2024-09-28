@@ -405,222 +405,318 @@ describe("BadgeFacet", async function () {
     badgeFacet = await ethers.getContractAt("BadgeFacet", diamondAddress);
   });
 
-  it("should add a badge", async function () {
-    const rarity = 1;
-    const gameId = 0;
-    const gameTitle = "Test Game";
-    const title = "Test Badge";
-    const description = "Test Description";
+  describe("adding and updating badges", async function () {
+    it("should add a badge", async function () {
+      const rarity = 1;
+      const gameId = 0;
+      const gameTitle = "Test Game";
+      const title = "Test Badge";
+      const description = "Test Description";
 
-    await expect(
-      badgeFacet
-        .connect(owner)
-        .addBadge(rarity, gameId, gameTitle, title, description)
-    )
-      .to.emit(badgeFacet, "BadgeAdded")
-      .withArgs(0, rarity, gameId, gameTitle, title, description);
+      await expect(
+        badgeFacet
+          .connect(owner)
+          .addBadge(rarity, gameId, gameTitle, title, description)
+      )
+        .to.emit(badgeFacet, "BadgeAdded")
+        .withArgs(0, rarity, gameId, gameTitle, title, description);
 
-    const badges = await badgeFacet.getBadges([0]);
-    expect(badges[0].rarity).to.equal(rarity);
-    expect(badges[0].gameId).to.equal(gameId);
-    expect(badges[0].title).to.equal(title);
-    expect(badges[0].description).to.equal(description);
-  });
+      const badges = await badgeFacet.getBadges([0]);
+      expect(badges[0].rarity).to.equal(rarity);
+      expect(badges[0].gameId).to.equal(gameId);
+      expect(badges[0].title).to.equal(title);
+      expect(badges[0].description).to.equal(description);
+    });
 
-  it("should update a badge", async function () {
-    const badgeId = 0;
-    const newRarity = 2;
-    const newGameId = 1;
-    const newGameTitle = "Updated Game";
-    const newTitle = "Updated Badge";
-    const newDescription = "Updated Description";
+    it("should update a badge", async function () {
+      const badgeId = 0;
+      const newRarity = 2;
+      const newGameId = 1;
+      const newGameTitle = "Updated Game";
+      const newTitle = "Updated Badge";
+      const newDescription = "Updated Description";
 
-    await expect(
-      badgeFacet
-        .connect(owner)
-        .updateBadge(
+      await expect(
+        badgeFacet
+          .connect(owner)
+          .updateBadge(
+            badgeId,
+            newRarity,
+            newGameId,
+            newGameTitle,
+            newTitle,
+            newDescription
+          )
+      )
+        .to.emit(badgeFacet, "BadgeUpdated")
+        .withArgs(
           badgeId,
           newRarity,
           newGameId,
           newGameTitle,
           newTitle,
           newDescription
-        )
-    )
-      .to.emit(badgeFacet, "BadgeUpdated")
-      .withArgs(
-        badgeId,
-        newRarity,
-        newGameId,
-        newGameTitle,
-        newTitle,
-        newDescription
-      );
+        );
 
-    const badges = await badgeFacet.getBadges([badgeId]);
-    expect(badges[0].rarity).to.equal(newRarity);
-    expect(badges[0].gameId).to.equal(newGameId);
-    expect(badges[0].title).to.equal(newTitle);
-    expect(badges[0].description).to.equal(newDescription);
+      const badges = await badgeFacet.getBadges([badgeId]);
+      expect(badges[0].rarity).to.equal(newRarity);
+      expect(badges[0].gameId).to.equal(newGameId);
+      expect(badges[0].title).to.equal(newTitle);
+      expect(badges[0].description).to.equal(newDescription);
+    });
+
+    it("should batch add badges", async function () {
+      const rarities = [1, 2, 3];
+      const gameIds = [0, 1, 2];
+      const gameTitles = ["Game 1", "Game 2", "Game 3"];
+      const titles = ["Badge 1", "Badge 2", "Badge 3"];
+      const descriptions = ["Desc 1", "Desc 2", "Desc 3"];
+
+      const tx = await badgeFacet
+        .connect(owner)
+        .batchAddBadges(rarities, gameIds, gameTitles, titles, descriptions);
+      const receipt = await tx.wait();
+
+      expect(
+        receipt.events?.filter((e: any) => e.event === "BadgeAdded")
+      ).to.have.length(3);
+
+      const badges = await badgeFacet.getBadges([1, 2, 3]);
+      expect(badges).to.have.length(3);
+      for (let i = 0; i < 3; i++) {
+        expect(badges[i].rarity).to.equal(rarities[i]);
+        expect(badges[i].gameId).to.equal(gameIds[i]);
+        expect(badges[i].title).to.equal(titles[i]);
+        expect(badges[i].description).to.equal(descriptions[i]);
+      }
+    });
   });
 
-  it("should batch add badges", async function () {
-    const rarities = [1, 2, 3];
-    const gameIds = [0, 1, 2];
-    const gameTitles = ["Game 1", "Game 2", "Game 3"];
-    const titles = ["Badge 1", "Badge 2", "Badge 3"];
-    const descriptions = ["Desc 1", "Desc 2", "Desc 3"];
+  describe("minting badges", async function () {
+    it("should mint a badge and badge count should be 1", async function () {
+      const badgeId = 0;
+      await expect(
+        badgeFacet.connect(owner).mintBadge(await user.getAddress(), badgeId)
+      )
+        .to.emit(badgeFacet, "BadgeMinted")
+        .withArgs(await user.getAddress(), badgeId);
 
-    const tx = await badgeFacet
-      .connect(owner)
-      .batchAddBadges(rarities, gameIds, gameTitles, titles, descriptions);
-    const receipt = await tx.wait();
-
-    expect(
-      receipt.events?.filter((e: any) => e.event === "BadgeAdded")
-    ).to.have.length(3);
-
-    const badges = await badgeFacet.getBadges([1, 2, 3]);
-    expect(badges).to.have.length(3);
-    for (let i = 0; i < 3; i++) {
-      expect(badges[i].rarity).to.equal(rarities[i]);
-      expect(badges[i].gameId).to.equal(gameIds[i]);
-      expect(badges[i].title).to.equal(titles[i]);
-      expect(badges[i].description).to.equal(descriptions[i]);
-    }
-  });
-
-  it("should mint a badge", async function () {
-    const badgeId = 0;
-    await expect(
-      badgeFacet.connect(owner).mintBadge(await user.getAddress(), badgeId)
-    )
-      .to.emit(badgeFacet, "BadgeMinted")
-      .withArgs(await user.getAddress(), badgeId);
-
-    const balance = await badgeFacet.balanceOf(
-      await user.getAddress(),
-      badgeId
-    );
-    expect(balance).to.equal(1);
-  });
-
-  it("should not allow minting a badge twice", async function () {
-    const badgeId = 0;
-    await expect(
-      badgeFacet.connect(owner).mintBadge(await user.getAddress(), badgeId)
-    ).to.be.revertedWith("User already owns this badge");
-  });
-
-  it("should batch mint badges", async function () {
-    const users = [await user.getAddress(), await owner.getAddress()];
-    const badgeIds = [1, 2];
-
-    await badgeFacet.connect(owner).batchMintBadges(users, badgeIds);
-
-    for (let i = 0; i < users.length; i++) {
-      const balance = await badgeFacet.balanceOf(users[i], badgeIds[i]);
-      expect(balance).to.equal(1);
-    }
-  });
-
-  it("should admin transfer badges", async function () {
-    const badgeIds = [1];
-    await badgeFacet
-      .connect(owner)
-      .adminTransferBadges(
+      const balance = await badgeFacet.balanceOf(
         await user.getAddress(),
-        await owner.getAddress(),
-        badgeIds
+        badgeId
       );
 
-    const userBalance = await badgeFacet.balanceOf(
-      await user.getAddress(),
-      badgeIds[0]
-    );
-    const ownerBalance = await badgeFacet.balanceOf(
-      await owner.getAddress(),
-      badgeIds[0]
-    );
+      const badge = (await badgeFacet.getBadges([badgeId]))[0];
 
-    expect(userBalance).to.equal(0);
-    expect(ownerBalance).to.equal(1);
+      expect(badge.count).to.equal(1);
+      expect(balance).to.equal(1);
+    });
+
+    it("should not allow minting a badge twice", async function () {
+      const badgeId = 0;
+      await expect(
+        badgeFacet.connect(owner).mintBadge(await user.getAddress(), badgeId)
+      ).to.be.revertedWith("User already owns this badge");
+    });
+
+    it("should batch mint badges", async function () {
+      const users = [await user.getAddress(), await owner.getAddress()];
+      const badgeIds = [1, 2];
+
+      await badgeFacet.connect(owner).batchMintBadges(users, badgeIds);
+
+      for (let i = 0; i < users.length; i++) {
+        const balance = await badgeFacet.balanceOf(users[i], badgeIds[i]);
+        expect(balance).to.equal(1);
+      }
+    });
   });
 
-  it("should get all badges when no ids are provided", async function () {
-    const badges = await badgeFacet.getBadges([]);
-    expect(badges.length).to.be.greaterThan(0);
-  });
-
-  it("should get specific badges when ids are provided", async function () {
-    const badgeIds = [0, 1, 2];
-    const badges = await badgeFacet.getBadges(badgeIds);
-    expect(badges.length).to.equal(badgeIds.length);
-    for (let i = 0; i < badges.length; i++) {
-      expect(badges[i].id).to.equal(badgeIds[i]);
-    }
-  });
-
-  it("should allow viewing multiple badges in a single get", async function () {
-    // First, ensure we have at least 3 badges to test with
-    const rarity = 1;
-    const gameId = 0;
-    const gameTitle = "Test Game";
-    const titles = ["Badge 1", "Badge 2", "Badge 3"];
-    const description = "Test Description";
-
-    for (let i = 0; i < 3; i++) {
+  describe("transferring badges", async function () {
+    it("should admin transfer badges", async function () {
+      const badgeIds = [1];
       await badgeFacet
         .connect(owner)
-        .addBadge(rarity, gameId, gameTitle, titles[i], description);
-    }
+        .adminTransferBadges(
+          await user.getAddress(),
+          await owner.getAddress(),
+          badgeIds
+        );
 
-    // Now, get multiple badges in a single call
-    const badgeIds = [0, 1, 2];
-    const badges = await badgeFacet.getBadges(badgeIds);
+      const userBalance = await badgeFacet.balanceOf(
+        await user.getAddress(),
+        badgeIds[0]
+      );
+      const ownerBalance = await badgeFacet.balanceOf(
+        await owner.getAddress(),
+        badgeIds[0]
+      );
 
-    // Verify the results
-    expect(badges.length).to.equal(badgeIds.length);
+      expect(userBalance).to.equal(0);
+      expect(ownerBalance).to.equal(1);
+    });
+
+    it("should not allow non-admin to admin transfer badges", async function () {
+      const badgeIds = [1];
+      await expect(
+        badgeFacet
+          .connect(user)
+          .adminTransferBadges(
+            await owner.getAddress(),
+            await user.getAddress(),
+            badgeIds
+          )
+      ).to.be.revertedWith("LibDiamond: Must be contract owner");
+    });
+
+    it("should not allow normal safeTransferFrom transfers", async function () {
+      const badgeIds = [1];
+      await expect(
+        badgeFacet
+          .connect(owner)
+          .safeTransferFrom(
+            await user.getAddress(),
+            await owner.getAddress(),
+            badgeIds[0],
+            1,
+            "0x"
+          )
+      ).to.be.revertedWithCustomError(badgeFacet, "NonTransferableToken");
+    });
   });
-  it("should render on-chain attributes properly", async function () {
-    // Add a new badge
-    const rarity = 2;
-    const gameId = 1;
-    const gameTitle = "Test Game";
-    const title = "Test Badge";
-    const description = "This is a test badge";
 
-    const tx = await badgeFacet
-      .connect(owner)
-      .addBadge(rarity, gameId, gameTitle, title, description);
-    const receipt = await tx.wait();
-    const badgeId = receipt?.events?.find((e: any) => e.event === "BadgeAdded")
-      ?.args?.badgeId;
+  describe("burning badges", async function () {
+    it("should allow admin transferring badges to the zero address, and points should be updated, and count should be lowered", async function () {
+      const badgeId = 1;
 
-    // Get the URI for the newly added badge
+      // First, ensure the owner has the badge
+      const ownerAddress = await owner.getAddress();
+      const ownerBalance = await badgeFacet.balanceOf(ownerAddress, badgeId);
+      if (ownerBalance.eq(0)) {
+        await badgeFacet.connect(owner).mintBadge(ownerAddress, badgeId);
+      }
 
-    const uri = await badgeFacet.uri(badgeId);
+      // Get initial points and badge count
+      const initialPoints = await badgeFacet.getUserPoints(ownerAddress);
+      const initialBadge = (await badgeFacet.getBadges([badgeId]))[0];
+      const initialCount = initialBadge.count.toNumber();
 
-    // Decode the base64 encoded JSON
-    const jsonString = Buffer.from(uri.split(",")[1], "base64").toString();
-    const metadata = JSON.parse(jsonString);
+      // Get badge rarity to calculate expected points reduction
+      const pointsForRarity = await badgeFacet.getPointsForRarity(
+        initialBadge.rarity
+      );
 
-    // Check if the metadata contains the correct attributes
-    expect(metadata.name).to.equal(title);
-    expect(metadata.description).to.equal(description);
-    expect(metadata.attributes).to.deep.include({
-      trait_type: "Rarity",
-      value: rarity.toString(),
+      // Attempt to burn the badge
+      await badgeFacet.connect(owner).burn(ownerAddress, badgeId, 1);
+
+      // Verify the transfer
+      const newOwnerBalance = await badgeFacet.balanceOf(ownerAddress, badgeId);
+      expect(newOwnerBalance).to.equal(0);
+
+      // Verify points have been updated
+      const finalPoints = await badgeFacet.getUserPoints(ownerAddress);
+      expect(finalPoints).to.equal(initialPoints.sub(pointsForRarity));
+
+      // Verify badge count has been lowered
+      const finalBadge = (await badgeFacet.getBadges([badgeId]))[0];
+      expect(finalBadge.count).to.equal(initialCount - 1);
     });
-    expect(metadata.attributes).to.deep.include({
-      trait_type: "Game ID",
-      value: gameId.toString(),
-    });
-    expect(metadata["id"]).to.equal(badgeId.toString());
 
-    // Check if the image URL is correctly formed
-    expect(metadata.image).to.equal(
-      `https://example.com/badge-images/${badgeId}.png`
-    );
+    it("should not allow non-admin to burn badges", async function () {
+      const badgeId = 1;
+      await expect(
+        badgeFacet.connect(user).burn(await owner.getAddress(), badgeId, 1)
+      ).to.be.revertedWith("LibDiamond: Must be contract owner");
+    });
+
+    it("should not allow burning more than one badge at a time", async function () {
+      const badgeId = 1;
+      await expect(
+        badgeFacet.connect(owner).burn(await user.getAddress(), badgeId, 2)
+      ).to.be.revertedWith("Can only burn one badge at a time");
+    });
+  });
+
+  describe("viewing badges", async function () {
+    it("should get all badges when no ids are provided", async function () {
+      const badges = await badgeFacet.getBadges([]);
+      expect(badges.length).to.be.greaterThan(0);
+    });
+
+    it("should get specific badges when ids are provided", async function () {
+      const badgeIds = [0, 1, 2];
+      const badges = await badgeFacet.getBadges(badgeIds);
+      expect(badges.length).to.equal(badgeIds.length);
+      for (let i = 0; i < badges.length; i++) {
+        expect(badges[i].id).to.equal(badgeIds[i]);
+      }
+    });
+
+    it("should allow viewing multiple badges in a single get", async function () {
+      // First, ensure we have at least 3 badges to test with
+      const rarity = 1;
+      const gameId = 0;
+      const gameTitle = "Test Game";
+      const titles = ["Badge 1", "Badge 2", "Badge 3"];
+      const description = "Test Description";
+
+      for (let i = 0; i < 3; i++) {
+        await badgeFacet
+          .connect(owner)
+          .addBadge(rarity, gameId, gameTitle, titles[i], description);
+      }
+
+      // Now, get multiple badges in a single call
+      const badgeIds = [0, 1, 2];
+      const badges = await badgeFacet.getBadges(badgeIds);
+
+      // Verify the results
+      expect(badges.length).to.equal(badgeIds.length);
+    });
+
+    describe("onchain metadata", async function () {
+      it("should render on-chain attributes properly", async function () {
+        // Add a new badge
+        const rarity = 2;
+        const gameId = 1;
+        const gameTitle = "Test Game";
+        const title = "Test Badge";
+        const description = "This is a test badge";
+
+        const tx = await badgeFacet
+          .connect(owner)
+          .addBadge(rarity, gameId, gameTitle, title, description);
+        const receipt = await tx.wait();
+        const badgeId = receipt?.events?.find(
+          (e: any) => e.event === "BadgeAdded"
+        )?.args?.badgeId;
+
+        // Get the URI for the newly added badge
+
+        const uri = await badgeFacet.uri(badgeId);
+
+        // Decode the base64 encoded JSON
+        const jsonString = Buffer.from(uri.split(",")[1], "base64").toString();
+        const metadata = JSON.parse(jsonString);
+
+        // Check if the metadata contains the correct attributes
+        expect(metadata.name).to.equal(title);
+        expect(metadata.description).to.equal(description);
+        expect(metadata.attributes).to.deep.include({
+          trait_type: "Rarity",
+          value: rarity.toString(),
+        });
+        expect(metadata.attributes).to.deep.include({
+          trait_type: "Game ID",
+          value: gameId.toString(),
+        });
+        expect(metadata["id"]).to.equal(badgeId.toString());
+
+        // Check if the image URL is correctly formed
+        expect(metadata.image).to.equal(
+          `https://example.com/badge-images/${badgeId}.png`
+        );
+      });
+    });
   });
 });

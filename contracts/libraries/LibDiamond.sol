@@ -40,6 +40,7 @@ library LibDiamond {
         string title;
         string description;
         uint256 earnedOn;
+        uint256 count;
     }
 
     struct DiamondStorage {

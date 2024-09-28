@@ -6,14 +6,26 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 import "../libraries/LibDiamond.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 
-contract BadgeFacet is ERC1155, Modifiers {
+contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
     event BadgeAdded(uint256 indexed badgeId, uint256 rarity, uint256 gameId, string gameTitle, string title, string description);
     event BadgeUpdated(uint256 indexed badgeId, uint256 rarity, uint256 gameId, string gameTitle, string title, string description);
     event BadgeMinted(address indexed to, uint256 indexed badgeId);
     event URISet(string newuri);
 
+    error NonTransferableToken();
+
     constructor() ERC1155("") {}
+
+    // Override and disable transfer functions
+    function safeTransferFrom(address, address, uint256, uint256, bytes memory) public virtual override {
+        revert NonTransferableToken();
+    }
+
+    function safeBatchTransferFrom(address, address, uint256[] memory, uint256[] memory, bytes memory) public virtual override {
+        revert NonTransferableToken();
+    }
 
     function addBadge(
         uint256 _rarity,
@@ -25,7 +37,17 @@ contract BadgeFacet is ERC1155, Modifiers {
         LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
         uint256 newBadgeId = ds.badges.length;
 
-        ds.badges.push(LibDiamond.Badge({id: newBadgeId, rarity: _rarity, gameId: _gameId, title: _title, description: _description, earnedOn: 0}));
+        ds.badges.push(
+            LibDiamond.Badge({
+                id: newBadgeId,
+                rarity: _rarity,
+                gameId: _gameId,
+                title: _title,
+                description: _description,
+                earnedOn: 0,
+                count: 0 // Initialize count to 0
+            })
+        );
 
         emit BadgeAdded(newBadgeId, _rarity, _gameId, _gameTitle, _title, _description);
         return newBadgeId;
@@ -103,15 +125,11 @@ contract BadgeFacet is ERC1155, Modifiers {
         require(balanceOf(_to, _badgeId) == 0, "User already owns this badge");
 
         LibDiamond.Badge storage badge = ds.badges[_badgeId];
-        uint256 points;
-
-        if (badge.rarity == 0) points = 5;
-        else if (badge.rarity == 1) points = 10;
-        else if (badge.rarity == 2) points = 20;
-        else if (badge.rarity == 3) points = 100;
+        uint256 points = getPointsForRarity(badge.rarity);
 
         ds.userToPoints[_to] += points;
         badge.earnedOn = block.timestamp;
+        badge.count++; // Increment the count when minting
 
         _mint(_to, _badgeId, 1, "");
         emit BadgeMinted(_to, _badgeId);
@@ -181,5 +199,42 @@ contract BadgeFacet is ERC1155, Modifiers {
                     )
                 )
             );
+    }
+
+    function burn(address account, uint256 id, uint256 value) public virtual override onlyContractOwner {
+        require(value == 1, "Can only burn one badge at a time");
+        _burn(account, id, 1);
+
+        LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
+        LibDiamond.Badge storage badge = ds.badges[id];
+        uint256 points = getPointsForRarity(badge.rarity);
+        ds.userToPoints[account] -= points;
+        badge.count -= 1; // Decrement the count by 1 when burning
+    }
+
+    function burnBatch(address account, uint256[] memory ids, uint256[] memory values) public virtual override onlyContractOwner {
+        _burnBatch(account, ids, values);
+
+        LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
+        for (uint256 i = 0; i < ids.length; i++) {
+            require(values[i] == 1, "Can only burn one badge at a time");
+            LibDiamond.Badge storage badge = ds.badges[ids[i]];
+            uint256 points = getPointsForRarity(badge.rarity);
+            ds.userToPoints[account] -= points * values[i];
+            badge.count -= values[i]; // Decrement the count when burning
+        }
+    }
+
+    // Helper function to get points for a rarity level
+    function getPointsForRarity(uint256 rarity) public pure returns (uint256) {
+        if (rarity == 0) return 5;
+        else if (rarity == 1) return 10;
+        else if (rarity == 2) return 20;
+        else if (rarity == 3) return 100;
+        else return 0;
+    }
+
+    function getUserPoints(address user) external view returns (uint256) {
+        return LibDiamond.diamondStorage().userToPoints[user];
     }
 }
