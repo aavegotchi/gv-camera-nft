@@ -5,7 +5,8 @@ import { describe, it, before } from "mocha";
 import { deployDiamond } from "../scripts/deploy";
 import { getSelectors } from "../scripts/libraries/diamond";
 import { expect } from "chai";
-import { BadgeFacet } from "../src/types";
+import { AdminFacet, BadgeFacet, GamesFacet, PointsFacet } from "../src/types";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 const { assert } = require("chai");
 
@@ -85,13 +86,13 @@ describe("DiamondTest", async function () {
   });
 });
 
-let adminFacet: any;
-let gamesFacet: any;
-let pointsFacet: any;
-let owner: any;
-let nonOwner: any;
-let admin1: any;
-let admin2: any;
+let adminFacet: AdminFacet;
+let gamesFacet: GamesFacet;
+let pointsFacet: PointsFacet;
+let owner: SignerWithAddress;
+let nonOwner: SignerWithAddress;
+let admin1: SignerWithAddress;
+let admin2: SignerWithAddress;
 
 describe("AdminFacet", async function () {
   before(async () => {
@@ -391,8 +392,8 @@ describe("GamesFacet", async function () {
 
 describe("BadgeFacet", async function () {
   let badgeFacet: BadgeFacet;
-  let owner: Signer;
-  let user: Signer;
+  let owner: SignerWithAddress;
+  let user: SignerWithAddress;
 
   before(async function () {
     const addresses = await ethers.getSigners();
@@ -493,10 +494,16 @@ describe("BadgeFacet", async function () {
   });
 
   describe("minting badges", async function () {
+    it("only agc admins can mint badges", async function () {
+      await expect(
+        badgeFacet.connect(user).mintBadge(await user.getAddress(), 0)
+      ).to.be.revertedWith("LibDiamond: Must be AGC admin");
+    });
+
     it("should mint a badge and badge count should be 1", async function () {
       const badgeId = 0;
       await expect(
-        badgeFacet.connect(owner).mintBadge(await user.getAddress(), badgeId)
+        badgeFacet.connect(admin1).mintBadge(await user.getAddress(), badgeId)
       )
         .to.emit(badgeFacet, "BadgeMinted")
         .withArgs(await user.getAddress(), badgeId);
@@ -515,7 +522,7 @@ describe("BadgeFacet", async function () {
     it("should not allow minting a badge twice", async function () {
       const badgeId = 0;
       await expect(
-        badgeFacet.connect(owner).mintBadge(await user.getAddress(), badgeId)
+        badgeFacet.connect(admin1).mintBadge(await user.getAddress(), badgeId)
       ).to.be.revertedWith("User already owns this badge");
     });
 
@@ -523,7 +530,7 @@ describe("BadgeFacet", async function () {
       const users = [await user.getAddress(), await owner.getAddress()];
       const badgeIds = [1, 2];
 
-      await badgeFacet.connect(owner).batchMintBadges(users, badgeIds);
+      await badgeFacet.connect(admin1).batchMintBadges(users, badgeIds);
 
       for (let i = 0; i < users.length; i++) {
         const balance = await badgeFacet.balanceOf(users[i], badgeIds[i]);

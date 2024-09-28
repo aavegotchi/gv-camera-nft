@@ -119,7 +119,7 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         }
     }
 
-    function mintBadge(address _to, uint256 _badgeId) public onlyContractOwner {
+    function mintBadge(address _to, uint256 _badgeId) public onlyAGCAdmin {
         LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
         require(_badgeId >= 0 && _badgeId < ds.badges.length, "Badge does not exist");
         require(balanceOf(_to, _badgeId) == 0, "User already owns this badge");
@@ -135,7 +135,7 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         emit BadgeMinted(_to, _badgeId);
     }
 
-    function batchMintBadges(address[] calldata _to, uint256[] calldata _badgeIds) external onlyContractOwner {
+    function batchMintBadges(address[] calldata _to, uint256[] calldata _badgeIds) external onlyAGCAdmin {
         require(_to.length == _badgeIds.length, "Input arrays must have the same length");
 
         for (uint256 i = 0; i < _to.length; i++) {
