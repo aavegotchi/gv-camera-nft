@@ -26,23 +26,6 @@ library LibDiamond {
         uint256 facetAddressPosition; // position of facetAddress in facetAddresses array
     }
 
-    struct Game {
-        uint256 gameId;
-        string gameTitle;
-        string gameDescription;
-        uint256 lastUpdated;
-    }
-
-    struct Badge {
-        uint256 id;
-        uint256 rarity;
-        uint256 gameId;
-        string title;
-        string description;
-        uint256 earnedOn;
-        uint256 count;
-    }
-
     struct DiamondStorage {
         // maps function selector to the facet address and
         // the position of the selector in the facetFunctionSelectors.selectors array
@@ -56,12 +39,6 @@ library LibDiamond {
         mapping(bytes4 => bool) supportedInterfaces;
         // owner of the contract
         address contractOwner;
-        //Aavegotchi Gaming Console
-        mapping(address => bool) agcAdmins;
-        mapping(address => uint256) userToPoints;
-        Game[] games;
-        mapping(uint256 => Game) idToGame;
-        Badge[] badges;
     }
 
     function diamondStorage() internal pure returns (DiamondStorage storage ds) {
@@ -228,17 +205,5 @@ library LibDiamond {
             contractSize := extcodesize(_contract)
         }
         require(contractSize > 0, _errorMessage);
-    }
-}
-
-contract Modifiers {
-    modifier onlyContractOwner() {
-        require(msg.sender == LibDiamond.contractOwner(), "LibDiamond: Must be contract owner");
-        _;
-    }
-
-    modifier onlyAGCAdmin() {
-        require(LibDiamond.diamondStorage().agcAdmins[msg.sender], "LibDiamond: Must be AGC admin");
-        _;
     }
 }

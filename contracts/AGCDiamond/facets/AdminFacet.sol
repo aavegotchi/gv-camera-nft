@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.1;
 
-import {LibDiamond, Modifiers} from "../libraries/LibDiamond.sol";
+import {LibAppStorageAGC, Modifiers} from "../../libraries/LibAppStorageAGC.sol";
 
 contract AdminFacet is Modifiers {
     event AGCAdminStatusChanged(address indexed admin, bool isAdmin);
 
     function setAGCAdmin(address _admin, bool _isAdmin) external onlyContractOwner {
-        LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
+        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
         ds.agcAdmins[_admin] = _isAdmin;
         emit AGCAdminStatusChanged(_admin, _isAdmin);
     }
@@ -15,7 +15,7 @@ contract AdminFacet is Modifiers {
     function setAGCAdminsBatch(address[] calldata _admins, bool[] calldata _isAdmins) external onlyContractOwner {
         require(_admins.length == _isAdmins.length, "AdminFacet: Input arrays must have the same length");
 
-        LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
+        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
 
         for (uint256 i = 0; i < _admins.length; i++) {
             ds.agcAdmins[_admins[i]] = _isAdmins[i];
@@ -24,7 +24,7 @@ contract AdminFacet is Modifiers {
     }
 
     function isAGCAdmin(address _admin) external view returns (bool) {
-        LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
+        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
         return ds.agcAdmins[_admin];
     }
 }

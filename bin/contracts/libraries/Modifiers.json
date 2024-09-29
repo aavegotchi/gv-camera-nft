@@ -1,0 +1,1210 @@
+{
+    "contractName": "Modifiers",
+    "abi": [],
+    "metadata": "{\"compiler\":{\"version\":\"0.8.27+commit.40a35a09\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/coderdan/Documents/GitHub/agc-contracts/contracts/libraries/AppStorageAGC.sol\":\"Modifiers\"},\"evmVersion\":\"cancun\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[],\"viaIR\":true},\"sources\":{\"/Users/coderdan/Documents/GitHub/agc-contracts/contracts/interfaces/IDiamondCut.sol\":{\"keccak256\":\"0xc00c16bfa30a3fa5f3dc684f7f8ba62c259962b25f647d9588739458989717fc\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://119d9a5acd99b9462a8341c9b95ddd468648799eefa47038f81521431743c1ae\",\"dweb:/ipfs/QmTF7WNyPWTUtUzNcpq5rf5v2uw5TwzqsSg9D53pfQufcu\"]},\"/Users/coderdan/Documents/GitHub/agc-contracts/contracts/libraries/AppStorageAGC.sol\":{\"keccak256\":\"0xd3e7a8f886aaa4ced01c7bf89c1d1292f1bc415e752131c926619c616c9e17c4\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://e0a77a658531f7e724356a7d8d76e1e383fc79904b9fec80702274641c5ea9e1\",\"dweb:/ipfs/QmVv4GyMBpwYErsupNXdxYBU2Nog61g8qmtpMLULEKp2Np\"]},\"/Users/coderdan/Documents/GitHub/agc-contracts/contracts/libraries/LibDiamond.sol\":{\"keccak256\":\"0xff1269fa1cb1e3f71575aa1b58ea4432f50a7d0e241aab4ba2d534352d522e37\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://2068a5319614e9441b8972d2e8ef6b712f2069af51c6c1a582608f70e16dfbf9\",\"dweb:/ipfs/QmctJNR3aBrrZwaGFB2etFcg69qmfPrruVhmb4VmM3rLb5\"]}},\"version\":1}",
+    "bytecode": "608080604052346013576039908160188239f35b5f80fdfe5f80fdfea26469706673582212206ed422d1b8111fdabcb8d5d48d7c5408b5378b2462ff298a942c7e0850d5009864736f6c634300081b0033",
+    "deployedBytecode": "5f80fdfea26469706673582212206ed422d1b8111fdabcb8d5d48d7c5408b5378b2462ff298a942c7e0850d5009864736f6c634300081b0033",
+    "sourceMap": "764:326:1:-:0;;;;;;;;;;;;;;;;;",
+    "deployedSourceMap": "764:326:1:-:0;;",
+    "sourcePath": "/Users/coderdan/Documents/GitHub/agc-contracts/contracts/libraries/AppStorageAGC.sol",
+    "compiler": {
+        "name": "solc",
+        "version": "0.8.27+commit.40a35a09"
+    },
+    "ast": {
+        "absolutePath": "/Users/coderdan/Documents/GitHub/agc-contracts/contracts/libraries/AppStorageAGC.sol",
+        "exportedSymbols": {
+            "AppStorageAGC": [
+                87
+            ],
+            "Badge": [
+                65
+            ],
+            "Game": [
+                50
+            ],
+            "LibAppStorageAGC": [
+                96
+            ],
+            "LibDiamond": [
+                937
+            ],
+            "Modifiers": [
+                126
+            ]
+        },
+        "id": 127,
+        "license": "MIT",
+        "nodeType": "SourceUnit",
+        "nodes": [
+            {
+                "id": 39,
+                "literals": [
+                    "solidity",
+                    "^",
+                    "0.8",
+                    ".1"
+                ],
+                "nodeType": "PragmaDirective",
+                "src": "32:23:1"
+            },
+            {
+                "absolutePath": "/Users/coderdan/Documents/GitHub/agc-contracts/contracts/libraries/LibDiamond.sol",
+                "file": "./LibDiamond.sol",
+                "id": 41,
+                "nameLocation": "-1:-1:-1",
+                "nodeType": "ImportDirective",
+                "scope": 127,
+                "sourceUnit": 938,
+                "src": "57:44:1",
+                "symbolAliases": [
+                    {
+                        "foreign": {
+                            "id": 40,
+                            "name": "LibDiamond",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 937,
+                            "src": "65:10:1",
+                            "typeDescriptions": {}
+                        },
+                        "nameLocation": "-1:-1:-1"
+                    }
+                ],
+                "unitAlias": ""
+            },
+            {
+                "canonicalName": "Game",
+                "id": 50,
+                "members": [
+                    {
+                        "constant": false,
+                        "id": 43,
+                        "mutability": "mutable",
+                        "name": "gameId",
+                        "nameLocation": "129:6:1",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 50,
+                        "src": "121:14:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                        },
+                        "typeName": {
+                            "id": 42,
+                            "name": "uint256",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "121:7:1",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                            }
+                        },
+                        "visibility": "internal"
+                    },
+                    {
+                        "constant": false,
+                        "id": 45,
+                        "mutability": "mutable",
+                        "name": "gameTitle",
+                        "nameLocation": "148:9:1",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 50,
+                        "src": "141:16:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_string_storage_ptr",
+                            "typeString": "string"
+                        },
+                        "typeName": {
+                            "id": 44,
+                            "name": "string",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "141:6:1",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_string_storage_ptr",
+                                "typeString": "string"
+                            }
+                        },
+                        "visibility": "internal"
+                    },
+                    {
+                        "constant": false,
+                        "id": 47,
+                        "mutability": "mutable",
+                        "name": "gameDescription",
+                        "nameLocation": "170:15:1",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 50,
+                        "src": "163:22:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_string_storage_ptr",
+                            "typeString": "string"
+                        },
+                        "typeName": {
+                            "id": 46,
+                            "name": "string",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "163:6:1",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_string_storage_ptr",
+                                "typeString": "string"
+                            }
+                        },
+                        "visibility": "internal"
+                    },
+                    {
+                        "constant": false,
+                        "id": 49,
+                        "mutability": "mutable",
+                        "name": "lastUpdated",
+                        "nameLocation": "199:11:1",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 50,
+                        "src": "191:19:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                        },
+                        "typeName": {
+                            "id": 48,
+                            "name": "uint256",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "191:7:1",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                            }
+                        },
+                        "visibility": "internal"
+                    }
+                ],
+                "name": "Game",
+                "nameLocation": "110:4:1",
+                "nodeType": "StructDefinition",
+                "scope": 127,
+                "src": "103:110:1",
+                "visibility": "public"
+            },
+            {
+                "canonicalName": "Badge",
+                "id": 65,
+                "members": [
+                    {
+                        "constant": false,
+                        "id": 52,
+                        "mutability": "mutable",
+                        "name": "id",
+                        "nameLocation": "242:2:1",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 65,
+                        "src": "234:10:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                        },
+                        "typeName": {
+                            "id": 51,
+                            "name": "uint256",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "234:7:1",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                            }
+                        },
+                        "visibility": "internal"
+                    },
+                    {
+                        "constant": false,
+                        "id": 54,
+                        "mutability": "mutable",
+                        "name": "rarity",
+                        "nameLocation": "258:6:1",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 65,
+                        "src": "250:14:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                        },
+                        "typeName": {
+                            "id": 53,
+                            "name": "uint256",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "250:7:1",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                            }
+                        },
+                        "visibility": "internal"
+                    },
+                    {
+                        "constant": false,
+                        "id": 56,
+                        "mutability": "mutable",
+                        "name": "gameId",
+                        "nameLocation": "278:6:1",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 65,
+                        "src": "270:14:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                        },
+                        "typeName": {
+                            "id": 55,
+                            "name": "uint256",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "270:7:1",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                            }
+                        },
+                        "visibility": "internal"
+                    },
+                    {
+                        "constant": false,
+                        "id": 58,
+                        "mutability": "mutable",
+                        "name": "title",
+                        "nameLocation": "297:5:1",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 65,
+                        "src": "290:12:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_string_storage_ptr",
+                            "typeString": "string"
+                        },
+                        "typeName": {
+                            "id": 57,
+                            "name": "string",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "290:6:1",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_string_storage_ptr",
+                                "typeString": "string"
+                            }
+                        },
+                        "visibility": "internal"
+                    },
+                    {
+                        "constant": false,
+                        "id": 60,
+                        "mutability": "mutable",
+                        "name": "description",
+                        "nameLocation": "315:11:1",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 65,
+                        "src": "308:18:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_string_storage_ptr",
+                            "typeString": "string"
+                        },
+                        "typeName": {
+                            "id": 59,
+                            "name": "string",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "308:6:1",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_string_storage_ptr",
+                                "typeString": "string"
+                            }
+                        },
+                        "visibility": "internal"
+                    },
+                    {
+                        "constant": false,
+                        "id": 62,
+                        "mutability": "mutable",
+                        "name": "earnedOn",
+                        "nameLocation": "340:8:1",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 65,
+                        "src": "332:16:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                        },
+                        "typeName": {
+                            "id": 61,
+                            "name": "uint256",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "332:7:1",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                            }
+                        },
+                        "visibility": "internal"
+                    },
+                    {
+                        "constant": false,
+                        "id": 64,
+                        "mutability": "mutable",
+                        "name": "count",
+                        "nameLocation": "362:5:1",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 65,
+                        "src": "354:13:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                        },
+                        "typeName": {
+                            "id": 63,
+                            "name": "uint256",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "354:7:1",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                            }
+                        },
+                        "visibility": "internal"
+                    }
+                ],
+                "name": "Badge",
+                "nameLocation": "222:5:1",
+                "nodeType": "StructDefinition",
+                "scope": 127,
+                "src": "215:155:1",
+                "visibility": "public"
+            },
+            {
+                "canonicalName": "AppStorageAGC",
+                "id": 87,
+                "members": [
+                    {
+                        "constant": false,
+                        "id": 69,
+                        "mutability": "mutable",
+                        "name": "agcAdmins",
+                        "nameLocation": "456:9:1",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 87,
+                        "src": "431:34:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                            "typeString": "mapping(address => bool)"
+                        },
+                        "typeName": {
+                            "id": 68,
+                            "keyName": "",
+                            "keyNameLocation": "-1:-1:-1",
+                            "keyType": {
+                                "id": 66,
+                                "name": "address",
+                                "nodeType": "ElementaryTypeName",
+                                "src": "439:7:1",
+                                "typeDescriptions": {
+                                    "typeIdentifier": "t_address",
+                                    "typeString": "address"
+                                }
+                            },
+                            "nodeType": "Mapping",
+                            "src": "431:24:1",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                                "typeString": "mapping(address => bool)"
+                            },
+                            "valueName": "",
+                            "valueNameLocation": "-1:-1:-1",
+                            "valueType": {
+                                "id": 67,
+                                "name": "bool",
+                                "nodeType": "ElementaryTypeName",
+                                "src": "450:4:1",
+                                "typeDescriptions": {
+                                    "typeIdentifier": "t_bool",
+                                    "typeString": "bool"
+                                }
+                            }
+                        },
+                        "visibility": "internal"
+                    },
+                    {
+                        "constant": false,
+                        "id": 73,
+                        "mutability": "mutable",
+                        "name": "userToPoints",
+                        "nameLocation": "499:12:1",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 87,
+                        "src": "471:40:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                            "typeString": "mapping(address => uint256)"
+                        },
+                        "typeName": {
+                            "id": 72,
+                            "keyName": "",
+                            "keyNameLocation": "-1:-1:-1",
+                            "keyType": {
+                                "id": 70,
+                                "name": "address",
+                                "nodeType": "ElementaryTypeName",
+                                "src": "479:7:1",
+                                "typeDescriptions": {
+                                    "typeIdentifier": "t_address",
+                                    "typeString": "address"
+                                }
+                            },
+                            "nodeType": "Mapping",
+                            "src": "471:27:1",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                                "typeString": "mapping(address => uint256)"
+                            },
+                            "valueName": "",
+                            "valueNameLocation": "-1:-1:-1",
+                            "valueType": {
+                                "id": 71,
+                                "name": "uint256",
+                                "nodeType": "ElementaryTypeName",
+                                "src": "490:7:1",
+                                "typeDescriptions": {
+                                    "typeIdentifier": "t_uint256",
+                                    "typeString": "uint256"
+                                }
+                            }
+                        },
+                        "visibility": "internal"
+                    },
+                    {
+                        "constant": false,
+                        "id": 77,
+                        "mutability": "mutable",
+                        "name": "games",
+                        "nameLocation": "524:5:1",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 87,
+                        "src": "517:12:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_array$_t_struct$_Game_$50_storage_$dyn_storage_ptr",
+                            "typeString": "struct Game[]"
+                        },
+                        "typeName": {
+                            "baseType": {
+                                "id": 75,
+                                "nodeType": "UserDefinedTypeName",
+                                "pathNode": {
+                                    "id": 74,
+                                    "name": "Game",
+                                    "nameLocations": [
+                                        "517:4:1"
+                                    ],
+                                    "nodeType": "IdentifierPath",
+                                    "referencedDeclaration": 50,
+                                    "src": "517:4:1"
+                                },
+                                "referencedDeclaration": 50,
+                                "src": "517:4:1",
+                                "typeDescriptions": {
+                                    "typeIdentifier": "t_struct$_Game_$50_storage_ptr",
+                                    "typeString": "struct Game"
+                                }
+                            },
+                            "id": 76,
+                            "nodeType": "ArrayTypeName",
+                            "src": "517:6:1",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_array$_t_struct$_Game_$50_storage_$dyn_storage_ptr",
+                                "typeString": "struct Game[]"
+                            }
+                        },
+                        "visibility": "internal"
+                    },
+                    {
+                        "constant": false,
+                        "id": 82,
+                        "mutability": "mutable",
+                        "name": "idToGame",
+                        "nameLocation": "560:8:1",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 87,
+                        "src": "535:33:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Game_$50_storage_$",
+                            "typeString": "mapping(uint256 => struct Game)"
+                        },
+                        "typeName": {
+                            "id": 81,
+                            "keyName": "",
+                            "keyNameLocation": "-1:-1:-1",
+                            "keyType": {
+                                "id": 78,
+                                "name": "uint256",
+                                "nodeType": "ElementaryTypeName",
+                                "src": "543:7:1",
+                                "typeDescriptions": {
+                                    "typeIdentifier": "t_uint256",
+                                    "typeString": "uint256"
+                                }
+                            },
+                            "nodeType": "Mapping",
+                            "src": "535:24:1",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Game_$50_storage_$",
+                                "typeString": "mapping(uint256 => struct Game)"
+                            },
+                            "valueName": "",
+                            "valueNameLocation": "-1:-1:-1",
+                            "valueType": {
+                                "id": 80,
+                                "nodeType": "UserDefinedTypeName",
+                                "pathNode": {
+                                    "id": 79,
+                                    "name": "Game",
+                                    "nameLocations": [
+                                        "554:4:1"
+                                    ],
+                                    "nodeType": "IdentifierPath",
+                                    "referencedDeclaration": 50,
+                                    "src": "554:4:1"
+                                },
+                                "referencedDeclaration": 50,
+                                "src": "554:4:1",
+                                "typeDescriptions": {
+                                    "typeIdentifier": "t_struct$_Game_$50_storage_ptr",
+                                    "typeString": "struct Game"
+                                }
+                            }
+                        },
+                        "visibility": "internal"
+                    },
+                    {
+                        "constant": false,
+                        "id": 86,
+                        "mutability": "mutable",
+                        "name": "badges",
+                        "nameLocation": "582:6:1",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 87,
+                        "src": "574:14:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                            "typeIdentifier": "t_array$_t_struct$_Badge_$65_storage_$dyn_storage_ptr",
+                            "typeString": "struct Badge[]"
+                        },
+                        "typeName": {
+                            "baseType": {
+                                "id": 84,
+                                "nodeType": "UserDefinedTypeName",
+                                "pathNode": {
+                                    "id": 83,
+                                    "name": "Badge",
+                                    "nameLocations": [
+                                        "574:5:1"
+                                    ],
+                                    "nodeType": "IdentifierPath",
+                                    "referencedDeclaration": 65,
+                                    "src": "574:5:1"
+                                },
+                                "referencedDeclaration": 65,
+                                "src": "574:5:1",
+                                "typeDescriptions": {
+                                    "typeIdentifier": "t_struct$_Badge_$65_storage_ptr",
+                                    "typeString": "struct Badge"
+                                }
+                            },
+                            "id": 85,
+                            "nodeType": "ArrayTypeName",
+                            "src": "574:7:1",
+                            "typeDescriptions": {
+                                "typeIdentifier": "t_array$_t_struct$_Badge_$65_storage_$dyn_storage_ptr",
+                                "typeString": "struct Badge[]"
+                            }
+                        },
+                        "visibility": "internal"
+                    }
+                ],
+                "name": "AppStorageAGC",
+                "nameLocation": "379:13:1",
+                "nodeType": "StructDefinition",
+                "scope": 127,
+                "src": "372:219:1",
+                "visibility": "public"
+            },
+            {
+                "abstract": false,
+                "baseContracts": [],
+                "canonicalName": "LibAppStorageAGC",
+                "contractDependencies": [],
+                "contractKind": "library",
+                "fullyImplemented": true,
+                "id": 96,
+                "linearizedBaseContracts": [
+                    96
+                ],
+                "name": "LibAppStorageAGC",
+                "nameLocation": "601:16:1",
+                "nodeType": "ContractDefinition",
+                "nodes": [
+                    {
+                        "body": {
+                            "id": 94,
+                            "nodeType": "Block",
+                            "src": "699:61:1",
+                            "statements": [
+                                {
+                                    "AST": {
+                                        "nativeSrc": "718:36:1",
+                                        "nodeType": "YulBlock",
+                                        "src": "718:36:1",
+                                        "statements": [
+                                            {
+                                                "nativeSrc": "732:12:1",
+                                                "nodeType": "YulAssignment",
+                                                "src": "732:12:1",
+                                                "value": {
+                                                    "kind": "number",
+                                                    "nativeSrc": "743:1:1",
+                                                    "nodeType": "YulLiteral",
+                                                    "src": "743:1:1",
+                                                    "type": "",
+                                                    "value": "0"
+                                                },
+                                                "variableNames": [
+                                                    {
+                                                        "name": "ds.slot",
+                                                        "nativeSrc": "732:7:1",
+                                                        "nodeType": "YulIdentifier",
+                                                        "src": "732:7:1"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "evmVersion": "cancun",
+                                    "externalReferences": [
+                                        {
+                                            "declaration": 91,
+                                            "isOffset": false,
+                                            "isSlot": true,
+                                            "src": "732:7:1",
+                                            "suffix": "slot",
+                                            "valueSize": 1
+                                        }
+                                    ],
+                                    "id": 93,
+                                    "nodeType": "InlineAssembly",
+                                    "src": "709:45:1"
+                                }
+                            ]
+                        },
+                        "id": 95,
+                        "implemented": true,
+                        "kind": "function",
+                        "modifiers": [],
+                        "name": "diamondStorage",
+                        "nameLocation": "633:14:1",
+                        "nodeType": "FunctionDefinition",
+                        "parameters": {
+                            "id": 88,
+                            "nodeType": "ParameterList",
+                            "parameters": [],
+                            "src": "647:2:1"
+                        },
+                        "returnParameters": {
+                            "id": 92,
+                            "nodeType": "ParameterList",
+                            "parameters": [
+                                {
+                                    "constant": false,
+                                    "id": 91,
+                                    "mutability": "mutable",
+                                    "name": "ds",
+                                    "nameLocation": "695:2:1",
+                                    "nodeType": "VariableDeclaration",
+                                    "scope": 95,
+                                    "src": "673:24:1",
+                                    "stateVariable": false,
+                                    "storageLocation": "storage",
+                                    "typeDescriptions": {
+                                        "typeIdentifier": "t_struct$_AppStorageAGC_$87_storage_ptr",
+                                        "typeString": "struct AppStorageAGC"
+                                    },
+                                    "typeName": {
+                                        "id": 90,
+                                        "nodeType": "UserDefinedTypeName",
+                                        "pathNode": {
+                                            "id": 89,
+                                            "name": "AppStorageAGC",
+                                            "nameLocations": [
+                                                "673:13:1"
+                                            ],
+                                            "nodeType": "IdentifierPath",
+                                            "referencedDeclaration": 87,
+                                            "src": "673:13:1"
+                                        },
+                                        "referencedDeclaration": 87,
+                                        "src": "673:13:1",
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_struct$_AppStorageAGC_$87_storage_ptr",
+                                            "typeString": "struct AppStorageAGC"
+                                        }
+                                    },
+                                    "visibility": "internal"
+                                }
+                            ],
+                            "src": "672:26:1"
+                        },
+                        "scope": 96,
+                        "src": "624:136:1",
+                        "stateMutability": "pure",
+                        "virtual": false,
+                        "visibility": "internal"
+                    }
+                ],
+                "scope": 127,
+                "src": "593:169:1",
+                "usedErrors": [],
+                "usedEvents": []
+            },
+            {
+                "abstract": false,
+                "baseContracts": [],
+                "canonicalName": "Modifiers",
+                "contractDependencies": [],
+                "contractKind": "contract",
+                "fullyImplemented": true,
+                "id": 126,
+                "linearizedBaseContracts": [
+                    126
+                ],
+                "name": "Modifiers",
+                "nameLocation": "773:9:1",
+                "nodeType": "ContractDefinition",
+                "nodes": [
+                    {
+                        "body": {
+                            "id": 109,
+                            "nodeType": "Block",
+                            "src": "818:115:1",
+                            "statements": [
+                                {
+                                    "expression": {
+                                        "arguments": [
+                                            {
+                                                "commonType": {
+                                                    "typeIdentifier": "t_address",
+                                                    "typeString": "address"
+                                                },
+                                                "id": 104,
+                                                "isConstant": false,
+                                                "isLValue": false,
+                                                "isPure": false,
+                                                "lValueRequested": false,
+                                                "leftExpression": {
+                                                    "expression": {
+                                                        "id": 99,
+                                                        "name": "msg",
+                                                        "nodeType": "Identifier",
+                                                        "overloadedDeclarations": [],
+                                                        "referencedDeclaration": 4294967281,
+                                                        "src": "836:3:1",
+                                                        "typeDescriptions": {
+                                                            "typeIdentifier": "t_magic_message",
+                                                            "typeString": "msg"
+                                                        }
+                                                    },
+                                                    "id": 100,
+                                                    "isConstant": false,
+                                                    "isLValue": false,
+                                                    "isPure": false,
+                                                    "lValueRequested": false,
+                                                    "memberLocation": "840:6:1",
+                                                    "memberName": "sender",
+                                                    "nodeType": "MemberAccess",
+                                                    "src": "836:10:1",
+                                                    "typeDescriptions": {
+                                                        "typeIdentifier": "t_address",
+                                                        "typeString": "address"
+                                                    }
+                                                },
+                                                "nodeType": "BinaryOperation",
+                                                "operator": "==",
+                                                "rightExpression": {
+                                                    "arguments": [],
+                                                    "expression": {
+                                                        "argumentTypes": [],
+                                                        "expression": {
+                                                            "id": 101,
+                                                            "name": "LibDiamond",
+                                                            "nodeType": "Identifier",
+                                                            "overloadedDeclarations": [],
+                                                            "referencedDeclaration": 937,
+                                                            "src": "850:10:1",
+                                                            "typeDescriptions": {
+                                                                "typeIdentifier": "t_type$_t_contract$_LibDiamond_$937_$",
+                                                                "typeString": "type(library LibDiamond)"
+                                                            }
+                                                        },
+                                                        "id": 102,
+                                                        "isConstant": false,
+                                                        "isLValue": false,
+                                                        "isPure": false,
+                                                        "lValueRequested": false,
+                                                        "memberLocation": "861:13:1",
+                                                        "memberName": "contractOwner",
+                                                        "nodeType": "MemberAccess",
+                                                        "referencedDeclaration": 230,
+                                                        "src": "850:24:1",
+                                                        "typeDescriptions": {
+                                                            "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
+                                                            "typeString": "function () view returns (address)"
+                                                        }
+                                                    },
+                                                    "id": 103,
+                                                    "isConstant": false,
+                                                    "isLValue": false,
+                                                    "isPure": false,
+                                                    "kind": "functionCall",
+                                                    "lValueRequested": false,
+                                                    "nameLocations": [],
+                                                    "names": [],
+                                                    "nodeType": "FunctionCall",
+                                                    "src": "850:26:1",
+                                                    "tryCall": false,
+                                                    "typeDescriptions": {
+                                                        "typeIdentifier": "t_address",
+                                                        "typeString": "address"
+                                                    }
+                                                },
+                                                "src": "836:40:1",
+                                                "typeDescriptions": {
+                                                    "typeIdentifier": "t_bool",
+                                                    "typeString": "bool"
+                                                }
+                                            },
+                                            {
+                                                "hexValue": "4c69624469616d6f6e643a204d75737420626520636f6e7472616374206f776e6572",
+                                                "id": 105,
+                                                "isConstant": false,
+                                                "isLValue": false,
+                                                "isPure": true,
+                                                "kind": "string",
+                                                "lValueRequested": false,
+                                                "nodeType": "Literal",
+                                                "src": "878:36:1",
+                                                "typeDescriptions": {
+                                                    "typeIdentifier": "t_stringliteral_0d4ae41009c51fd276653a54d7793c24f266ddc8c56ce21f8be5e2c6595ab3ac",
+                                                    "typeString": "literal_string \"LibDiamond: Must be contract owner\""
+                                                },
+                                                "value": "LibDiamond: Must be contract owner"
+                                            }
+                                        ],
+                                        "expression": {
+                                            "argumentTypes": [
+                                                {
+                                                    "typeIdentifier": "t_bool",
+                                                    "typeString": "bool"
+                                                },
+                                                {
+                                                    "typeIdentifier": "t_stringliteral_0d4ae41009c51fd276653a54d7793c24f266ddc8c56ce21f8be5e2c6595ab3ac",
+                                                    "typeString": "literal_string \"LibDiamond: Must be contract owner\""
+                                                }
+                                            ],
+                                            "id": 98,
+                                            "name": "require",
+                                            "nodeType": "Identifier",
+                                            "overloadedDeclarations": [
+                                                4294967278,
+                                                4294967278,
+                                                4294967278
+                                            ],
+                                            "referencedDeclaration": 4294967278,
+                                            "src": "828:7:1",
+                                            "typeDescriptions": {
+                                                "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                                                "typeString": "function (bool,string memory) pure"
+                                            }
+                                        },
+                                        "id": 106,
+                                        "isConstant": false,
+                                        "isLValue": false,
+                                        "isPure": false,
+                                        "kind": "functionCall",
+                                        "lValueRequested": false,
+                                        "nameLocations": [],
+                                        "names": [],
+                                        "nodeType": "FunctionCall",
+                                        "src": "828:87:1",
+                                        "tryCall": false,
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_tuple$__$",
+                                            "typeString": "tuple()"
+                                        }
+                                    },
+                                    "id": 107,
+                                    "nodeType": "ExpressionStatement",
+                                    "src": "828:87:1"
+                                },
+                                {
+                                    "id": 108,
+                                    "nodeType": "PlaceholderStatement",
+                                    "src": "925:1:1"
+                                }
+                            ]
+                        },
+                        "id": 110,
+                        "name": "onlyContractOwner",
+                        "nameLocation": "798:17:1",
+                        "nodeType": "ModifierDefinition",
+                        "parameters": {
+                            "id": 97,
+                            "nodeType": "ParameterList",
+                            "parameters": [],
+                            "src": "815:2:1"
+                        },
+                        "src": "789:144:1",
+                        "virtual": false,
+                        "visibility": "internal"
+                    },
+                    {
+                        "body": {
+                            "id": 124,
+                            "nodeType": "Block",
+                            "src": "963:125:1",
+                            "statements": [
+                                {
+                                    "expression": {
+                                        "arguments": [
+                                            {
+                                                "baseExpression": {
+                                                    "expression": {
+                                                        "arguments": [],
+                                                        "expression": {
+                                                            "argumentTypes": [],
+                                                            "expression": {
+                                                                "id": 113,
+                                                                "name": "LibAppStorageAGC",
+                                                                "nodeType": "Identifier",
+                                                                "overloadedDeclarations": [],
+                                                                "referencedDeclaration": 96,
+                                                                "src": "981:16:1",
+                                                                "typeDescriptions": {
+                                                                    "typeIdentifier": "t_type$_t_contract$_LibAppStorageAGC_$96_$",
+                                                                    "typeString": "type(library LibAppStorageAGC)"
+                                                                }
+                                                            },
+                                                            "id": 114,
+                                                            "isConstant": false,
+                                                            "isLValue": false,
+                                                            "isPure": false,
+                                                            "lValueRequested": false,
+                                                            "memberLocation": "998:14:1",
+                                                            "memberName": "diamondStorage",
+                                                            "nodeType": "MemberAccess",
+                                                            "referencedDeclaration": 95,
+                                                            "src": "981:31:1",
+                                                            "typeDescriptions": {
+                                                                "typeIdentifier": "t_function_internal_pure$__$returns$_t_struct$_AppStorageAGC_$87_storage_ptr_$",
+                                                                "typeString": "function () pure returns (struct AppStorageAGC storage pointer)"
+                                                            }
+                                                        },
+                                                        "id": 115,
+                                                        "isConstant": false,
+                                                        "isLValue": false,
+                                                        "isPure": false,
+                                                        "kind": "functionCall",
+                                                        "lValueRequested": false,
+                                                        "nameLocations": [],
+                                                        "names": [],
+                                                        "nodeType": "FunctionCall",
+                                                        "src": "981:33:1",
+                                                        "tryCall": false,
+                                                        "typeDescriptions": {
+                                                            "typeIdentifier": "t_struct$_AppStorageAGC_$87_storage_ptr",
+                                                            "typeString": "struct AppStorageAGC storage pointer"
+                                                        }
+                                                    },
+                                                    "id": 116,
+                                                    "isConstant": false,
+                                                    "isLValue": true,
+                                                    "isPure": false,
+                                                    "lValueRequested": false,
+                                                    "memberLocation": "1015:9:1",
+                                                    "memberName": "agcAdmins",
+                                                    "nodeType": "MemberAccess",
+                                                    "referencedDeclaration": 69,
+                                                    "src": "981:43:1",
+                                                    "typeDescriptions": {
+                                                        "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                                                        "typeString": "mapping(address => bool)"
+                                                    }
+                                                },
+                                                "id": 119,
+                                                "indexExpression": {
+                                                    "expression": {
+                                                        "id": 117,
+                                                        "name": "msg",
+                                                        "nodeType": "Identifier",
+                                                        "overloadedDeclarations": [],
+                                                        "referencedDeclaration": 4294967281,
+                                                        "src": "1025:3:1",
+                                                        "typeDescriptions": {
+                                                            "typeIdentifier": "t_magic_message",
+                                                            "typeString": "msg"
+                                                        }
+                                                    },
+                                                    "id": 118,
+                                                    "isConstant": false,
+                                                    "isLValue": false,
+                                                    "isPure": false,
+                                                    "lValueRequested": false,
+                                                    "memberLocation": "1029:6:1",
+                                                    "memberName": "sender",
+                                                    "nodeType": "MemberAccess",
+                                                    "src": "1025:10:1",
+                                                    "typeDescriptions": {
+                                                        "typeIdentifier": "t_address",
+                                                        "typeString": "address"
+                                                    }
+                                                },
+                                                "isConstant": false,
+                                                "isLValue": true,
+                                                "isPure": false,
+                                                "lValueRequested": false,
+                                                "nodeType": "IndexAccess",
+                                                "src": "981:55:1",
+                                                "typeDescriptions": {
+                                                    "typeIdentifier": "t_bool",
+                                                    "typeString": "bool"
+                                                }
+                                            },
+                                            {
+                                                "hexValue": "4c69624469616d6f6e643a204d757374206265204147432061646d696e",
+                                                "id": 120,
+                                                "isConstant": false,
+                                                "isLValue": false,
+                                                "isPure": true,
+                                                "kind": "string",
+                                                "lValueRequested": false,
+                                                "nodeType": "Literal",
+                                                "src": "1038:31:1",
+                                                "typeDescriptions": {
+                                                    "typeIdentifier": "t_stringliteral_965c11b6806dd6cca20c944aaeb39ee494028f94dced4a66ceb9f0fb0e919285",
+                                                    "typeString": "literal_string \"LibDiamond: Must be AGC admin\""
+                                                },
+                                                "value": "LibDiamond: Must be AGC admin"
+                                            }
+                                        ],
+                                        "expression": {
+                                            "argumentTypes": [
+                                                {
+                                                    "typeIdentifier": "t_bool",
+                                                    "typeString": "bool"
+                                                },
+                                                {
+                                                    "typeIdentifier": "t_stringliteral_965c11b6806dd6cca20c944aaeb39ee494028f94dced4a66ceb9f0fb0e919285",
+                                                    "typeString": "literal_string \"LibDiamond: Must be AGC admin\""
+                                                }
+                                            ],
+                                            "id": 112,
+                                            "name": "require",
+                                            "nodeType": "Identifier",
+                                            "overloadedDeclarations": [
+                                                4294967278,
+                                                4294967278,
+                                                4294967278
+                                            ],
+                                            "referencedDeclaration": 4294967278,
+                                            "src": "973:7:1",
+                                            "typeDescriptions": {
+                                                "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                                                "typeString": "function (bool,string memory) pure"
+                                            }
+                                        },
+                                        "id": 121,
+                                        "isConstant": false,
+                                        "isLValue": false,
+                                        "isPure": false,
+                                        "kind": "functionCall",
+                                        "lValueRequested": false,
+                                        "nameLocations": [],
+                                        "names": [],
+                                        "nodeType": "FunctionCall",
+                                        "src": "973:97:1",
+                                        "tryCall": false,
+                                        "typeDescriptions": {
+                                            "typeIdentifier": "t_tuple$__$",
+                                            "typeString": "tuple()"
+                                        }
+                                    },
+                                    "id": 122,
+                                    "nodeType": "ExpressionStatement",
+                                    "src": "973:97:1"
+                                },
+                                {
+                                    "id": 123,
+                                    "nodeType": "PlaceholderStatement",
+                                    "src": "1080:1:1"
+                                }
+                            ]
+                        },
+                        "id": 125,
+                        "name": "onlyAGCAdmin",
+                        "nameLocation": "948:12:1",
+                        "nodeType": "ModifierDefinition",
+                        "parameters": {
+                            "id": 111,
+                            "nodeType": "ParameterList",
+                            "parameters": [],
+                            "src": "960:2:1"
+                        },
+                        "src": "939:149:1",
+                        "virtual": false,
+                        "visibility": "internal"
+                    }
+                ],
+                "scope": 127,
+                "src": "764:326:1",
+                "usedErrors": [],
+                "usedEvents": []
+            }
+        ],
+        "src": "32:1059:1"
+    },
+    "functionHashes": {},
+    "gasEstimates": {
+        "creation": {
+            "codeDepositCost": "11400",
+            "executionCost": "69",
+            "totalCost": "11469"
+        }
+    }
+}

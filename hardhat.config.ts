@@ -4,7 +4,7 @@ import "@nomicfoundation/hardhat-chai-matchers";
 import "@typechain/hardhat";
 
 require("./tasks/deployUpgrade.ts");
-require("./tasks/generateDiamondABI");
+require("./tasks/generateDiamondABI_agc");
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
