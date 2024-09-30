@@ -2,15 +2,15 @@
 /* eslint prefer-const: "off" */
 
 import { ethers } from "hardhat";
-import { FacetCutAction, getSelectors } from "./libraries/diamond";
+import { FacetCutAction, getSelectors } from "../libraries/diamond";
 import {
   initialSeasonPoints,
   defaultWheelWeights,
   defaultWheelPoints,
   networkAddresses,
-} from "../constants";
+} from "../../constants";
 import { deployAGCDiamond } from "./deployAGCDiamond";
-import { IDiamondCut } from "../src/types";
+import { IDiamondCut } from "../../src/types";
 import { BytesLike } from "ethers";
 
 export async function deployGPDiamond(agcDiamond: string) {

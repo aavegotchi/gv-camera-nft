@@ -2,8 +2,8 @@
 /* eslint prefer-const: "off" */
 
 import { ethers } from "hardhat";
-import { FacetCutAction, getSelectors } from "./libraries/diamond";
-import { IDiamondCut } from "../src/types";
+import { FacetCutAction, getSelectors } from "../libraries/diamond";
+import { IDiamondCut } from "../../src/types";
 import { BytesLike } from "ethers";
 
 export async function deployAGCDiamond() {

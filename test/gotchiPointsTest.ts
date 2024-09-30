@@ -2,7 +2,7 @@ import { Contract } from "ethers";
 import { ethers } from "hardhat";
 //@ts-ignore
 import { describe, it, before } from "mocha";
-import { deployGPDiamond } from "../scripts/deployGPDiamond";
+import { deployGPDiamond } from "../scripts/deploy/deployGPDiamond";
 import { getSelectors } from "../scripts/libraries/diamond";
 import { expect } from "chai";
 import {
@@ -17,7 +17,7 @@ import {
 } from "../src/types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { parseEther } from "ethers/lib/utils";
-import { deployAGCDiamond } from "../scripts/deployAGCDiamond";
+import { deployAGCDiamond } from "../scripts/deploy/deployAGCDiamond";
 
 const { assert } = require("chai");
 
