@@ -2,7 +2,7 @@
 pragma solidity ^0.8.1;
 
 import {LibAppStorageGP, Modifiers} from "../../libraries/LibAppStorageGP.sol";
-import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {LibGotchiPoints} from "../../libraries/LibGotchiPoints.sol";
 
 contract GotchiPointsFacet is Modifiers {
@@ -16,11 +16,13 @@ contract GotchiPointsFacet is Modifiers {
 
         // Burn Alchemica tokens from the sender
 
-        //todo: check that the existing Alchemica can support this function
-        ERC20Burnable(s.fudContract).burnFrom(msg.sender, _fud);
-        ERC20Burnable(s.fomoContract).burnFrom(msg.sender, _fomo);
-        ERC20Burnable(s.alphaContract).burnFrom(msg.sender, _alpha);
-        ERC20Burnable(s.kekContract).burnFrom(msg.sender, _kek);
+        address burnAddress = 0x000000000000000000000000000000000000dEaD;
+
+        //Burn tokens by sending to burnAddress
+        IERC20(s.fudContract).transferFrom(msg.sender, burnAddress, _fud);
+        IERC20(s.fomoContract).transferFrom(msg.sender, burnAddress, _fomo);
+        IERC20(s.alphaContract).transferFrom(msg.sender, burnAddress, _alpha);
+        IERC20(s.kekContract).transferFrom(msg.sender, burnAddress, _kek);
 
         // Calculate points based on individual conversion rates
         uint256 totalPoints = _fud *

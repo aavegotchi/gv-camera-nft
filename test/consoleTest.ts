@@ -2,24 +2,37 @@ import { Contract, Signer } from "ethers";
 import { ethers } from "hardhat";
 //@ts-ignore
 import { describe, it, before } from "mocha";
-import { deployDiamond } from "../scripts/deployAGCDiamond";
+import { deployAGCDiamond } from "../scripts/deployAGCDiamond";
 import { getSelectors } from "../scripts/libraries/diamond";
 import { expect } from "chai";
-import { AdminFacet, BadgeFacet, GamesFacet, PointsFacet } from "../src/types";
+import {
+  AdminFacet,
+  BadgeFacet,
+  DiamondCutFacet,
+  DiamondLoupeFacet,
+  GamesFacet,
+  OwnershipFacet,
+  PointsFacet,
+} from "../src/types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { deployGPDiamond } from "../scripts/deployGPDiamond";
 
 const { assert } = require("chai");
 
 let diamondAddress: string;
-let diamondCutFacet: Contract;
-let diamondLoupeFacet: Contract;
-let ownershipFacet: Contract;
+let gpAddress: string;
+let diamondCutFacet: DiamondCutFacet;
+let diamondLoupeFacet: DiamondLoupeFacet;
+let ownershipFacet: OwnershipFacet;
 let result;
 const addresses: string[] = [];
 
 describe("DiamondTest", async function () {
   before(async function () {
-    diamondAddress = await deployDiamond();
+    //Deploy both diamonds
+    diamondAddress = await deployAGCDiamond();
+    gpAddress = await deployGPDiamond(diamondAddress);
+
     diamondCutFacet = await ethers.getContractAt(
       "DiamondCutFacet",
       diamondAddress
@@ -97,7 +110,18 @@ let admin2: SignerWithAddress;
 describe("AdminFacet", async function () {
   before(async () => {
     [owner, nonOwner, admin1, admin2] = await ethers.getSigners();
-    adminFacet = await ethers.getContractAt("AdminFacet", diamondAddress);
+
+    //set gp address in agcdiamond
+    adminFacet = (await ethers.getContractAt(
+      "AdminFacet",
+      diamondAddress
+    )) as AdminFacet;
+  });
+
+  it("should set gp address in agcdiamond", async () => {
+    await adminFacet.connect(owner).setGPDiamond(gpAddress);
+    const gpDiamond = await adminFacet.gpDiamond();
+    expect(gpDiamond).to.equal(gpAddress);
   });
 
   it("should allow the contract owner to set an admin", async () => {
