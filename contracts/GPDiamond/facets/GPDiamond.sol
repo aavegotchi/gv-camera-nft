@@ -36,15 +36,16 @@ contract GPDiamond {
 
         //set the alchemica addresses
         LibAppStorageGP.AppStorageGP storage s = LibAppStorageGP.diamondStorage();
-
         s.agcDiamond = _agcDiamond;
         s.fudContract = _fud;
         s.fomoContract = _fomo;
         s.alphaContract = _alpha;
         s.kekContract = _kek;
 
+        //Set the initial season pointd
         s.seasonToMaxPoints[0] = initialSeasonMaxPoints;
 
+        //Set the default wheel weights and points
         s.wheelWeights = _defaultWheelWeights;
         s.wheelPoints = _defaultWheelPoints;
     }

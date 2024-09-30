@@ -10,9 +10,10 @@ pragma solidity ^0.8.0;
 
 import {LibDiamond} from "../../libraries/LibDiamond.sol";
 import {IDiamondCut} from "../../interfaces/IDiamondCut.sol";
+import {LibAppStorageAGC} from "../../libraries/LibAppStorageAGC.sol";
 
 contract AGCDiamond {
-    constructor(address _contractOwner, address _diamondCutFacet) payable {
+    constructor(address _contractOwner, address _diamondCutFacet, address _agcAdmin) payable {
         LibDiamond.setContractOwner(_contractOwner);
 
         // Add the diamondCut external function from the diamondCutFacet
@@ -21,6 +22,12 @@ contract AGCDiamond {
         functionSelectors[0] = IDiamondCut.diamondCut.selector;
         cut[0] = IDiamondCut.FacetCut({facetAddress: _diamondCutFacet, action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors});
         LibDiamond.diamondCut(cut, address(0), "");
+
+        //set first agc admin
+        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
+        ds.agcAdmins[_agcAdmin] = true;
+
+        //can't set gp diamond here because it's not deployed yet
     }
 
     // Find facet for function that is called and execute the

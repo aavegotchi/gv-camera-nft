@@ -629,7 +629,7 @@ describe("spinning the wheel", async function () {
       }
 
       //log out the spin # and how many points
-      console.log(`Spin ${index}: ${points} points`);
+      // console.log(`Spin ${index}: ${points} points`);
 
       expect(Number(points)).to.be.gte(minPoints);
       expect(Number(points)).to.be.lte(maxPoints);

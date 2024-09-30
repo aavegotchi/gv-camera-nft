@@ -14,11 +14,11 @@ contract WheelFacet is Modifiers {
         return LibAppStorageGP.diamondStorage().agcDiamond;
     }
 
-    //Should change this to an internal function where Spins are granted by the BadgeFacet
     function grantSpins(address _user, uint256 _rarity) public onlyAGCDiamond {
         LibAppStorageGP.AppStorageGP storage s = LibAppStorageGP.diamondStorage();
-        s.userToSpins[_user] += getSpinsForBadge(_rarity);
-        emit SpinsGranted(_user, getSpinsForBadge(_rarity));
+        uint256 spinsToGrant = getSpinsForBadge(_rarity);
+        s.userToSpins[_user] += spinsToGrant;
+        emit SpinsGranted(_user, spinsToGrant);
     }
 
     function spinWheel() external {

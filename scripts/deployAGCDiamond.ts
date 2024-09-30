@@ -3,6 +3,8 @@
 
 import { ethers } from "hardhat";
 import { FacetCutAction, getSelectors } from "./libraries/diamond";
+import { IDiamondCut } from "../src/types";
+import { BytesLike } from "ethers";
 
 export async function deployAGCDiamond() {
   const accounts = await ethers.getSigners();
@@ -15,10 +17,11 @@ export async function deployAGCDiamond() {
   console.log("DiamondCutFacet deployed:", diamondCutFacet.address);
 
   // deploy Diamond
-  const Diamond = await ethers.getContractFactory("Diamond");
+  const Diamond = await ethers.getContractFactory("AGCDiamond");
   const diamond = await Diamond.deploy(
     contractOwner.address,
-    diamondCutFacet.address
+    diamondCutFacet.address,
+    contractOwner.address
   );
   await diamond.deployed();
   console.log("Diamond deployed:", diamond.address);
@@ -42,7 +45,7 @@ export async function deployAGCDiamond() {
     "GamesFacet",
     "BadgeFacet",
   ];
-  const cut = [];
+  const cut: IDiamondCut.FacetCutStruct[] = [];
 
   const uniqueSelectors = new Set();
 
@@ -71,7 +74,7 @@ export async function deployAGCDiamond() {
     cut.push({
       facetAddress: facet.address,
       action: FacetCutAction.Add,
-      functionSelectors: Array.from(localSelectors),
+      functionSelectors: Array.from(localSelectors) as BytesLike[],
     });
   }
 

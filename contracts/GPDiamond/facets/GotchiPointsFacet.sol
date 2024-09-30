@@ -9,11 +9,14 @@ contract GotchiPointsFacet is Modifiers {
     event PointsMinted(address indexed to, uint256 indexed season, uint256 amount);
     event ConversionRateAdjusted(address indexed token, uint256 rate);
     event SeasonMaxPointsSet(uint256 season, uint256 maxPoints);
+    event SeasonIncremented(uint256 season);
 
     function convertAlchemica(address _recipient, uint256 _fud, uint256 _fomo, uint256 _alpha, uint256 _kek) external {
         LibAppStorageGP.AppStorageGP storage s = LibAppStorageGP.diamondStorage();
 
-        // Transfer Alchemica tokens from the sender to this contract
+        // Burn Alchemica tokens from the sender
+
+        //todo: check that the existing Alchemica can support this function
         ERC20Burnable(s.fudContract).burnFrom(msg.sender, _fud);
         ERC20Burnable(s.fomoContract).burnFrom(msg.sender, _fomo);
         ERC20Burnable(s.alphaContract).burnFrom(msg.sender, _alpha);
@@ -63,6 +66,7 @@ contract GotchiPointsFacet is Modifiers {
         //Increments the current season.
         LibAppStorageGP.AppStorageGP storage s = LibAppStorageGP.diamondStorage();
         s.currentSeason++;
+        emit SeasonIncremented(s.currentSeason);
     }
 
     function setSeasonTotals(uint256 _season, uint256 _totalPoints) external onlyContractOwner {
@@ -77,10 +81,6 @@ contract GotchiPointsFacet is Modifiers {
 
     function currentSeason() external view returns (uint256) {
         return LibAppStorageGP.diamondStorage().currentSeason;
-    }
-    function getSeasonRemainingTime() external view returns (uint256) {
-        //todo
-        return 0;
     }
     function getUserPoints(address _user) external view returns (uint256) {
         return LibAppStorageGP.diamondStorage().userToPoints[_user];
@@ -106,9 +106,7 @@ contract GotchiPointsFacet is Modifiers {
         return LibAppStorageGP.diamondStorage().kekContract;
     }
 
-    //internal functions
-    function conversionRate(address _tokenAddress) internal view returns (uint256) {
-        //question: do we want this to be dynamic?
+    function conversionRate(address _tokenAddress) public view returns (uint256) {
         LibAppStorageGP.AppStorageGP storage s = LibAppStorageGP.diamondStorage();
         return s.tokenToConversionRate[_tokenAddress];
     }
