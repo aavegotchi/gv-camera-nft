@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/utils/Base64.sol";
 import {LibAppStorageAGC, Modifiers} from "../../libraries/LibAppStorageAGC.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
+import {WheelFacet} from "../../GPDiamond/facets/WheelFacet.sol";
 
 contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
     event BadgeAdded(uint256 indexed badgeId, uint256 rarity, uint256 gameId, string gameTitle, string title, string description);
@@ -130,6 +131,9 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         ds.userToPoints[_to] += points;
         badge.earnedOn = block.timestamp;
         badge.count++; // Increment the count when minting
+
+        WheelFacet wheelFacet = WheelFacet(address(ds.gpDiamond));
+        wheelFacet.grantSpins(_to, badge.rarity);
 
         _mint(_to, _badgeId, 1, "");
         emit BadgeMinted(_to, _badgeId);

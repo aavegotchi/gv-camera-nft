@@ -3,22 +3,67 @@
 
 import { ethers } from "hardhat";
 import { FacetCutAction, getSelectors } from "./libraries/diamond";
+import { maticAddresses } from "../constants";
+import { deployAGCDiamond } from "./deployAGCDiamond";
 
-export async function deployDiamond() {
+export async function deployGPDiamond(agcDiamond: string) {
+  let fud: string = ""; // Fud
+  let fomo: string = ""; // Fomo
+  let alpha: string = ""; // Alpha
+  let kek: string = ""; // Kek
+
+  if (agcDiamond === "") {
+    agcDiamond = await deployAGCDiamond();
+  }
+
   const accounts = await ethers.getSigners();
   const contractOwner = accounts[0];
 
+  const network = await ethers.provider.getNetwork();
+  console.log("Current network: ", network.name);
+
+  if (network.name === "hardhat" || network.name === "unknown") {
+    //deploy alchemica on local testnet
+    const Alchemica = await ethers.getContractFactory("Alchemica");
+    fud = (await Alchemica.deploy("Fud", "FUD")).address;
+    fomo = (await Alchemica.deploy("Fomo", "FOMO")).address;
+    alpha = (await Alchemica.deploy("Alpha", "ALPHA")).address;
+    kek = (await Alchemica.deploy("Kek", "KEK")).address;
+
+    console.log("Fud deployed: ", fud);
+    console.log("Fomo deployed: ", fomo);
+    console.log("Alpha deployed: ", alpha);
+    console.log("Kek deployed: ", kek);
+  } else if (network.name === "matic") {
+    fud = maticAddresses.FUD_ADDRESS;
+    fomo = maticAddresses.FOMO_ADDRESS;
+    alpha = maticAddresses.ALPHA_ADDRESS;
+    kek = maticAddresses.KEK_ADDRESS;
+  }
   // deploy DiamondCutFacet
   const DiamondCutFacet = await ethers.getContractFactory("DiamondCutFacet");
   const diamondCutFacet = await DiamondCutFacet.deploy();
   await diamondCutFacet.deployed();
   console.log("DiamondCutFacet deployed:", diamondCutFacet.address);
 
+  const initialSeasonPoints = ethers.utils.parseEther("1000000000");
+
+  const defaultWheelWeights = [50, 200, 500, 1500, 5000, 50000, 0];
+  const defaultWheelPoints = [50, 200, 500, 1500, 5000, 50000, 0];
+
   // deploy Diamond
-  const Diamond = await ethers.getContractFactory("Diamond");
+  const Diamond = await ethers.getContractFactory("GPDiamond");
   const diamond = await Diamond.deploy(
     contractOwner.address,
-    diamondCutFacet.address
+    diamondCutFacet.address,
+    agcDiamond,
+    fud,
+    fomo,
+    alpha,
+    kek,
+    initialSeasonPoints,
+    defaultWheelWeights,
+    defaultWheelPoints
   );
   await diamond.deployed();
   console.log("Diamond deployed:", diamond.address);
@@ -37,10 +82,9 @@ export async function deployDiamond() {
   const FacetNames = [
     "DiamondLoupeFacet",
     "OwnershipFacet",
-    "PointsFacet",
-    "AdminFacet",
-    "GamesFacet",
-    "BadgeFacet",
+    "GotchiPointsFacet",
+    // "VRFFacet",
+    "WheelFacet",
   ];
   const cut = [];
 
@@ -96,7 +140,7 @@ export async function deployDiamond() {
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 if (require.main === module) {
-  deployDiamond()
+  deployGPDiamond("")
     .then(() => process.exit(0))
     .catch((error) => {
       console.error(error);
@@ -104,4 +148,4 @@ if (require.main === module) {
     });
 }
 
-exports.deployDiamond = deployDiamond;
+exports.deployGPDiamond = deployGPDiamond;

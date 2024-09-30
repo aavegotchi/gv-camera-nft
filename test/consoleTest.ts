@@ -2,7 +2,7 @@ import { Contract, Signer } from "ethers";
 import { ethers } from "hardhat";
 //@ts-ignore
 import { describe, it, before } from "mocha";
-import { deployDiamond } from "../scripts/deploy";
+import { deployDiamond } from "../scripts/deployAGCDiamond";
 import { getSelectors } from "../scripts/libraries/diamond";
 import { expect } from "chai";
 import { AdminFacet, BadgeFacet, GamesFacet, PointsFacet } from "../src/types";

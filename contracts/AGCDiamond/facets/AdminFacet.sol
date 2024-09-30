@@ -23,6 +23,16 @@ contract AdminFacet is Modifiers {
         }
     }
 
+    function setGPDiamond(address _gpDiamond) external onlyContractOwner {
+        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
+        ds.gpDiamond = _gpDiamond;
+    }
+
+    function gpDiamond() external view returns (address) {
+        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
+        return ds.gpDiamond;
+    }
+
     function isAGCAdmin(address _admin) external view returns (bool) {
         LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
         return ds.agcAdmins[_admin];

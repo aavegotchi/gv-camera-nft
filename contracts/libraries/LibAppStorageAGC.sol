@@ -24,6 +24,7 @@ library LibAppStorageAGC {
     struct AppStorageAGC {
         //Aavegotchi Gaming Console
         mapping(address => bool) agcAdmins;
+        address gpDiamond;
         mapping(address => uint256) userToPoints;
         Game[] games;
         mapping(uint256 => Game) idToGame;

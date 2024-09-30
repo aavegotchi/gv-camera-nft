@@ -4,7 +4,7 @@ import { Contract } from "ethers";
 import { ethers } from "hardhat";
 // @ts-ignore
 import { describe, it, before } from "mocha";
-import { deployDiamond } from "../scripts/deploy";
+import { deployDiamond } from "../scripts/deployAGCDiamond";
 import { getSelectors } from "../scripts/libraries/diamond";
 
 const { assert } = require("chai");
