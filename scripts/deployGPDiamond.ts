@@ -3,8 +3,15 @@
 
 import { ethers } from "hardhat";
 import { FacetCutAction, getSelectors } from "./libraries/diamond";
-import { maticAddresses } from "../constants";
+import {
+  initialSeasonPoints,
+  defaultWheelWeights,
+  defaultWheelPoints,
+  networkAddresses,
+} from "../constants";
 import { deployAGCDiamond } from "./deployAGCDiamond";
+import { IDiamondCut } from "../src/types";
+import { BytesLike } from "ethers";
 
 export async function deployGPDiamond(agcDiamond: string) {
   let fud: string = ""; // Fud
@@ -34,22 +41,18 @@ export async function deployGPDiamond(agcDiamond: string) {
     console.log("Fomo deployed: ", fomo);
     console.log("Alpha deployed: ", alpha);
     console.log("Kek deployed: ", kek);
-  } else if (network.name === "matic") {
-    fud = maticAddresses.FUD_ADDRESS;
-    fomo = maticAddresses.FOMO_ADDRESS;
-    alpha = maticAddresses.ALPHA_ADDRESS;
-    kek = maticAddresses.KEK_ADDRESS;
+  } else {
+    fud = networkAddresses[network.name].FUD_ADDRESS;
+    fomo = networkAddresses[network.name].FOMO_ADDRESS;
+    alpha = networkAddresses[network.name].ALPHA_ADDRESS;
+    kek = networkAddresses[network.name].KEK_ADDRESS;
   }
+
   // deploy DiamondCutFacet
   const DiamondCutFacet = await ethers.getContractFactory("DiamondCutFacet");
   const diamondCutFacet = await DiamondCutFacet.deploy();
   await diamondCutFacet.deployed();
   console.log("DiamondCutFacet deployed:", diamondCutFacet.address);
-
-  const initialSeasonPoints = ethers.utils.parseEther("1000000000");
-
-  const defaultWheelWeights = [50, 200, 500, 1500, 5000, 50000, 0];
-  const defaultWheelPoints = [50, 200, 500, 1500, 5000, 50000, 0];
 
   // deploy Diamond
   const Diamond = await ethers.getContractFactory("GPDiamond");
@@ -61,7 +64,7 @@ export async function deployGPDiamond(agcDiamond: string) {
     fomo,
     alpha,
     kek,
-    initialSeasonPoints,
+    ethers.utils.parseEther(initialSeasonPoints),
     defaultWheelWeights,
     defaultWheelPoints
   );
@@ -83,10 +86,9 @@ export async function deployGPDiamond(agcDiamond: string) {
     "DiamondLoupeFacet",
     "OwnershipFacet",
     "GotchiPointsFacet",
-    // "VRFFacet",
     "WheelFacet",
   ];
-  const cut = [];
+  const cut: IDiamondCut.FacetCutStruct[] = [];
 
   const uniqueSelectors = new Set();
 
@@ -115,7 +117,7 @@ export async function deployGPDiamond(agcDiamond: string) {
     cut.push({
       facetAddress: facet.address,
       action: FacetCutAction.Add,
-      functionSelectors: Array.from(localSelectors),
+      functionSelectors: Array.from(localSelectors) as BytesLike[],
     });
   }
 
