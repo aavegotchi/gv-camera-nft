@@ -10,8 +10,26 @@ import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 import {WheelFacet} from "../../GPDiamond/facets/WheelFacet.sol";
 
 contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
-    event BadgeAdded(uint256 indexed badgeId, uint256 rarity, uint256 gameId, string gameTitle, string title, string description);
-    event BadgeUpdated(uint256 indexed badgeId, uint256 rarity, uint256 gameId, string gameTitle, string title, string description);
+    event BadgeAdded(
+        uint256 indexed id,
+        string badgeId,
+        uint256 rarity,
+        uint256 gameId,
+        string gameTitle,
+        string title,
+        string description,
+        string imageUrl
+    );
+    event BadgeUpdated(
+        uint256 id,
+        string badgeId,
+        uint256 rarity,
+        uint256 gameId,
+        string gameTitle,
+        string title,
+        string description,
+        string imageUrl
+    );
     event BadgeMinted(address indexed to, uint256 indexed badgeId);
     event URISet(string newuri);
 
@@ -30,56 +48,66 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
 
     function addBadge(
         uint256 _rarity,
+        string memory _badgeId, //ABC123 ID
         uint256 _gameId,
         string memory _gameTitle,
         string memory _title,
-        string memory _description
+        string memory _description,
+        string memory _imageUrl
     ) public onlyAGCAdminOrContractOwner returns (uint256) {
         LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
-        uint256 newBadgeId = ds.badges.length;
+        uint256 newId = ds.badges.length;
 
         ds.badges.push(
+            //change numeric badgegid to id and uid to badgeId
             LibAppStorageAGC.Badge({
-                id: newBadgeId,
+                id: newId,
                 rarity: _rarity,
+                badgeId: _badgeId,
                 gameId: _gameId,
                 title: _title,
                 description: _description,
                 earnedOn: 0,
-                count: 0 // Initialize count to 0
+                count: 0, // Initialize count to 0
+                imageUrl: _imageUrl
             })
         );
 
-        emit BadgeAdded(newBadgeId, _rarity, _gameId, _gameTitle, _title, _description);
-        return newBadgeId;
+        //ABC123 ID
+        emit BadgeAdded(newId, _badgeId, _rarity, _gameId, _gameTitle, _title, _description, _imageUrl);
+        return newId;
     }
 
     function updateBadge(
-        uint256 _badgeId,
+        uint256 _id,
+        string memory _badgeId,
         uint256 _rarity,
         uint256 _gameId,
         string memory _gameTitle,
         string memory _title,
-        string memory _description
+        string memory _description,
+        string memory _imageUrl
     ) public onlyAGCAdminOrContractOwner {
         LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
-        require(_badgeId >= 0 && _badgeId < ds.badges.length, "Badge does not exist");
+        require(_id >= 0 && _id < ds.badges.length, "Badge does not exist");
 
-        LibAppStorageAGC.Badge storage badge = ds.badges[_badgeId];
+        LibAppStorageAGC.Badge storage badge = ds.badges[_id];
         badge.rarity = _rarity;
         badge.gameId = _gameId;
         badge.title = _title;
         badge.description = _description;
-
-        emit BadgeUpdated(_badgeId, _rarity, _gameId, _gameTitle, _title, _description);
+        badge.imageUrl = _imageUrl;
+        emit BadgeUpdated(_id, _badgeId, _rarity, _gameId, _gameTitle, _title, _description, _imageUrl);
     }
 
     function batchAddBadges(
         uint256[] memory _rarities,
+        string[] memory _badgeIds,
         uint256[] memory _gameIds,
         string[] memory _gameTitles,
         string[] memory _titles,
-        string[] memory _descriptions
+        string[] memory _descriptions,
+        string[] memory _imageUrls
     ) external onlyAGCAdminOrContractOwner returns (uint256[] memory) {
         require(
             _rarities.length == _gameIds.length &&
@@ -92,19 +120,21 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         uint256[] memory newBadgeIds = new uint256[](_rarities.length);
 
         for (uint256 i = 0; i < _rarities.length; i++) {
-            newBadgeIds[i] = addBadge(_rarities[i], _gameIds[i], _gameTitles[i], _titles[i], _descriptions[i]);
+            newBadgeIds[i] = addBadge(_rarities[i], _badgeIds[i], _gameIds[i], _gameTitles[i], _titles[i], _descriptions[i], _imageUrls[i]);
         }
 
         return newBadgeIds;
     }
 
     function batchUpdateBadges(
-        uint256[] memory _badgeIds,
+        uint256[] memory _ids,
+        string[] memory _badgeIds,
         uint256[] memory _rarities,
         uint256[] memory _gameIds,
         string[] memory _gameTitles,
         string[] memory _titles,
-        string[] memory _descriptions
+        string[] memory _descriptions,
+        string[] memory _imageUrls
     ) external onlyAGCAdminOrContractOwner {
         require(
             _badgeIds.length == _rarities.length &&
@@ -116,7 +146,7 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         );
 
         for (uint256 i = 0; i < _badgeIds.length; i++) {
-            updateBadge(_badgeIds[i], _rarities[i], _gameIds[i], _gameTitles[i], _titles[i], _descriptions[i]);
+            updateBadge(_ids[i], _badgeIds[i], _rarities[i], _gameIds[i], _gameTitles[i], _titles[i], _descriptions[i], _imageUrls[i]);
         }
     }
 
@@ -129,6 +159,8 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         uint256 points = getPointsForRarity(badge.rarity);
 
         ds.userToPoints[_to] += points;
+        //emit event
+
         badge.earnedOn = block.timestamp;
         badge.count++; // Increment the count when minting
 
@@ -171,6 +203,10 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         return requestedBadges;
     }
 
+    function getBadgesLength() external view returns (uint256) {
+        return LibAppStorageAGC.diamondStorage().badges.length;
+    }
+
     // Add this new function to generate the token URI
     function uri(uint256 _tokenId) public view override returns (string memory) {
         LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
@@ -196,7 +232,8 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
                                 '"}], "id":"',
                                 Strings.toString(_tokenId),
                                 '", "image":"',
-                                string(abi.encodePacked("https://example.com/badge-images/", Strings.toString(_tokenId), ".png")),
+                                //aws url
+                                string(abi.encodePacked("https://arweave.net/", badge.imageUrl)),
                                 '"}'
                             )
                         )

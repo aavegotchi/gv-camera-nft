@@ -433,18 +433,37 @@ describe("BadgeFacet", async function () {
   describe("adding and updating badges", async function () {
     it("should add a badge", async function () {
       const rarity = 1;
+      const badgeId = "ABC123";
       const gameId = 0;
       const gameTitle = "Test Game";
       const title = "Test Badge";
       const description = "Test Description";
+      const imageUrl = "arweave/123";
 
       await expect(
         badgeFacet
           .connect(owner)
-          .addBadge(rarity, gameId, gameTitle, title, description)
+          .addBadge(
+            rarity,
+            badgeId,
+            gameId,
+            gameTitle,
+            title,
+            description,
+            imageUrl
+          )
       )
         .to.emit(badgeFacet, "BadgeAdded")
-        .withArgs(0, rarity, gameId, gameTitle, title, description);
+        .withArgs(
+          0,
+          badgeId,
+          rarity,
+          gameId,
+          gameTitle,
+          title,
+          description,
+          imageUrl
+        );
 
       const badges = await badgeFacet.getBadges([0]);
       expect(badges[0].rarity).to.equal(rarity);
@@ -454,36 +473,41 @@ describe("BadgeFacet", async function () {
     });
 
     it("should update a badge", async function () {
-      const badgeId = 0;
+      const id = 0;
+      const badgeId = "ABC123";
       const newRarity = 2;
       const newGameId = 1;
       const newGameTitle = "Updated Game";
       const newTitle = "Updated Badge";
       const newDescription = "Updated Description";
-
+      const newImageUrl = "arweave/123";
       await expect(
         badgeFacet
           .connect(owner)
           .updateBadge(
+            id,
             badgeId,
             newRarity,
             newGameId,
             newGameTitle,
             newTitle,
-            newDescription
+            newDescription,
+            newImageUrl
           )
       )
         .to.emit(badgeFacet, "BadgeUpdated")
         .withArgs(
+          id,
           badgeId,
           newRarity,
           newGameId,
           newGameTitle,
           newTitle,
-          newDescription
+          newDescription,
+          newImageUrl
         );
 
-      const badges = await badgeFacet.getBadges([badgeId]);
+      const badges = await badgeFacet.getBadges([id]);
       expect(badges[0].rarity).to.equal(newRarity);
       expect(badges[0].gameId).to.equal(newGameId);
       expect(badges[0].title).to.equal(newTitle);
@@ -492,14 +516,24 @@ describe("BadgeFacet", async function () {
 
     it("should batch add badges", async function () {
       const rarities = [1, 2, 3];
+      const badgeIds = ["ABC123", "ABC456", "ABC789"];
       const gameIds = [0, 1, 2];
       const gameTitles = ["Game 1", "Game 2", "Game 3"];
       const titles = ["Badge 1", "Badge 2", "Badge 3"];
       const descriptions = ["Desc 1", "Desc 2", "Desc 3"];
+      const imageUrls = ["arweave/123", "arweave/456", "arweave/789"];
 
       const tx = await badgeFacet
         .connect(owner)
-        .batchAddBadges(rarities, gameIds, gameTitles, titles, descriptions);
+        .batchAddBadges(
+          rarities,
+          badgeIds,
+          gameIds,
+          gameTitles,
+          titles,
+          descriptions,
+          imageUrls
+        );
       const receipt = await tx.wait();
 
       expect(
@@ -513,6 +547,7 @@ describe("BadgeFacet", async function () {
         expect(badges[i].gameId).to.equal(gameIds[i]);
         expect(badges[i].title).to.equal(titles[i]);
         expect(badges[i].description).to.equal(descriptions[i]);
+        expect(badges[i].imageUrl).to.equal(imageUrls[i]);
       }
     });
   });
@@ -690,11 +725,21 @@ describe("BadgeFacet", async function () {
       const gameTitle = "Test Game";
       const titles = ["Badge 1", "Badge 2", "Badge 3"];
       const description = "Test Description";
+      const imageUrl = "arweave/123";
+      const badgeId = "ABC123";
 
       for (let i = 0; i < 3; i++) {
         await badgeFacet
           .connect(owner)
-          .addBadge(rarity, gameId, gameTitle, titles[i], description);
+          .addBadge(
+            rarity,
+            badgeId,
+            gameId,
+            gameTitle,
+            titles[i],
+            description,
+            imageUrl
+          );
       }
 
       // Now, get multiple badges in a single call
@@ -708,23 +753,34 @@ describe("BadgeFacet", async function () {
     describe("onchain metadata", async function () {
       it("should render on-chain attributes properly", async function () {
         // Add a new badge
+
         const rarity = 2;
         const gameId = 1;
         const gameTitle = "Test Game";
         const title = "Test Badge";
         const description = "This is a test badge";
+        const imageUrl = "arweave/123";
+        const badgeId = "ABC123";
 
         const tx = await badgeFacet
           .connect(owner)
-          .addBadge(rarity, gameId, gameTitle, title, description);
+          .addBadge(
+            rarity,
+            badgeId,
+            gameId,
+            gameTitle,
+            title,
+            description,
+            imageUrl
+          );
         const receipt = await tx.wait();
-        const badgeId = receipt?.events?.find(
+        const badgeIdFound = receipt?.events?.find(
           (e: any) => e.event === "BadgeAdded"
-        )?.args?.badgeId;
+        )?.args?.id;
 
         // Get the URI for the newly added badge
 
-        const uri = await badgeFacet.uri(badgeId);
+        const uri = await badgeFacet.uri(badgeIdFound);
 
         // Decode the base64 encoded JSON
         const jsonString = Buffer.from(uri.split(",")[1], "base64").toString();
@@ -741,12 +797,10 @@ describe("BadgeFacet", async function () {
           trait_type: "Game ID",
           value: gameId.toString(),
         });
-        expect(metadata["id"]).to.equal(badgeId.toString());
+        expect(metadata["id"]).to.equal(badgeIdFound.toString());
 
         // Check if the image URL is correctly formed
-        expect(metadata.image).to.equal(
-          `https://example.com/badge-images/${badgeId}.png`
-        );
+        expect(metadata.image).to.equal(`https://arweave.net/${imageUrl}`);
       });
     });
   });

@@ -485,19 +485,22 @@ describe("spinning the wheel", async function () {
     );
 
     // User earns a badge
-    const badgeId = 0;
+    const id = 0;
     const rarity = 0;
+    const badgeId = "ABC123";
 
     const spinsToGrant = await wheelFacet.getSpinsForBadge(rarity);
 
     //add a new badge
-    await badgeFacet.connect(owner).addBadge(rarity, 1, "test", "test", "test");
+    await badgeFacet
+      .connect(owner)
+      .addBadge(rarity, badgeId, 1, "test", "test", "test", "test");
 
     // Check if spins were granted
     const spinsBeforeEarning = await wheelFacet.getUserSpins(nonOwner.address);
 
     //mint the badge to the user
-    await badgeFacet.connect(owner).mintBadge(nonOwner.address, badgeId);
+    await badgeFacet.connect(owner).mintBadge(nonOwner.address, id);
 
     const spinsAfterEarning = await wheelFacet.getUserSpins(nonOwner.address);
 

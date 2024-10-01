@@ -13,12 +13,14 @@ library LibAppStorageAGC {
 
     struct Badge {
         uint256 id;
+        string badgeId; //unique id for backend use
         uint256 rarity;
         uint256 gameId;
         string title;
         string description;
         uint256 earnedOn;
         uint256 count;
+        string imageUrl;
     }
 
     struct AppStorageAGC {
