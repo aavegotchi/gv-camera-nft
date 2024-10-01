@@ -13,7 +13,7 @@ import {IDiamondCut} from "../../interfaces/IDiamondCut.sol";
 import {LibAppStorageAGC} from "../../libraries/LibAppStorageAGC.sol";
 
 contract AGCDiamond {
-    constructor(address _contractOwner, address _diamondCutFacet, address _agcAdmin) payable {
+    constructor(address _contractOwner, address _diamondCutFacet, address[] memory _agcAdmins) payable {
         LibDiamond.setContractOwner(_contractOwner);
 
         // Add the diamondCut external function from the diamondCutFacet
@@ -25,7 +25,10 @@ contract AGCDiamond {
 
         //set first agc admin
         LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
-        ds.agcAdmins[_agcAdmin] = true;
+
+        for (uint256 i = 0; i < _agcAdmins.length; i++) {
+            ds.agcAdmins[_agcAdmins[i]] = true;
+        }
 
         //can't set gp diamond here because it's not deployed yet
     }

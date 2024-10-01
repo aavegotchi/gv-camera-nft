@@ -1,7 +1,7 @@
 /* global ethers */
 /* eslint prefer-const: "off" */
 
-import { ethers } from "hardhat";
+import { ethers, network } from "hardhat";
 import { cutDiamond } from "../helperFunctions";
 
 export async function deployAGCDiamond() {
@@ -14,12 +14,22 @@ export async function deployAGCDiamond() {
   await diamondCutFacet.deployed();
   console.log("DiamondCutFacet deployed:", diamondCutFacet.address);
 
+  const testAdmins = [
+    contractOwner.address,
+    "0xbCDe4ef0E8b16C1b691EF552FA4BBD98560b991b",
+    "0xAd0CEb6Dc055477b8a737B630D6210EFa76a2265",
+  ];
+
+  const realAdmins = [contractOwner.address];
+
   // deploy Diamond
   const Diamond = await ethers.getContractFactory("AGCDiamond");
   const diamond = await Diamond.deploy(
     contractOwner.address,
     diamondCutFacet.address,
-    contractOwner.address
+    ["unknown", "hardhat", "amoy"].includes(network.name)
+      ? testAdmins
+      : realAdmins
   );
   await diamond.deployed();
   console.log("Diamond deployed:", diamond.address);
