@@ -48,4 +48,12 @@ contract Modifiers {
         require(LibAppStorageAGC.diamondStorage().agcAdmins[msg.sender], "LibDiamond: Must be AGC admin");
         _;
     }
+
+    modifier onlyAGCAdminOrContractOwner() {
+        require(
+            msg.sender == LibDiamond.contractOwner() || LibAppStorageAGC.diamondStorage().agcAdmins[msg.sender],
+            "LibDiamond: Must be AGC admin or contract owner"
+        );
+        _;
+    }
 }

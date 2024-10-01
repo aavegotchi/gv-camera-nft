@@ -2,9 +2,7 @@
 /* eslint prefer-const: "off" */
 
 import { ethers } from "hardhat";
-import { FacetCutAction, getSelectors } from "../libraries/diamond";
-import { IDiamondCut } from "../../src/types";
-import { BytesLike } from "ethers";
+import { cutDiamond } from "../helperFunctions";
 
 export async function deployAGCDiamond() {
   const accounts = await ethers.getSigners();
@@ -45,54 +43,9 @@ export async function deployAGCDiamond() {
     "GamesFacet",
     "BadgeFacet",
   ];
-  const cut: IDiamondCut.FacetCutStruct[] = [];
 
-  const uniqueSelectors = new Set();
+  await cutDiamond(diamond.address, FacetNames, ethers, diamondInit);
 
-  for (const FacetName of FacetNames) {
-    const localSelectors = new Set();
-
-    const Facet = await ethers.getContractFactory(FacetName);
-    const facet = await Facet.deploy();
-    await facet.deployed();
-    console.log(`${FacetName} deployed: ${facet.address}`);
-
-    const selectors = getSelectors(facet);
-    for (const selector of selectors) {
-      if (uniqueSelectors.has(selector)) {
-        const functionName = facet.interface.getFunction(selector).name;
-
-        console.warn(
-          `Selector ${selector} (${functionName}) already in diamond`
-        );
-      } else {
-        uniqueSelectors.add(selector);
-        localSelectors.add(selector);
-      }
-    }
-
-    cut.push({
-      facetAddress: facet.address,
-      action: FacetCutAction.Add,
-      functionSelectors: Array.from(localSelectors) as BytesLike[],
-    });
-  }
-
-  // upgrade diamond with facets
-  console.log("");
-  console.log("Diamond Cut:", cut);
-  const diamondCut = await ethers.getContractAt("IDiamondCut", diamond.address);
-  let tx;
-  let receipt;
-  // call to init function
-  let functionCall = diamondInit.interface.encodeFunctionData("init");
-  tx = await diamondCut.diamondCut(cut, diamondInit.address, functionCall);
-  console.log("Diamond cut tx: ", tx.hash);
-  receipt = await tx.wait();
-  if (!receipt.status) {
-    throw Error(`Diamond upgrade failed: ${tx.hash}`);
-  }
-  console.log("Completed diamond cut");
   return diamond.address;
 }
 

@@ -209,7 +209,7 @@ describe("PointsFacet", async function () {
   it("should not allow non-admins to mint points", async () => {
     await expect(
       pointsFacet.connect(nonOwner).mintPoints(nonOwner.address, 100)
-    ).to.be.revertedWith("PointsFacet: Caller is not an AGC admin");
+    ).to.be.revertedWith("LibDiamond: Must be AGC admin or contract owner");
   });
 
   it("should not allow minting to zero address", async () => {
@@ -278,7 +278,7 @@ describe("GamesFacet", async function () {
       gamesFacet
         .connect(nonOwner)
         .registerGame("Non-owner Game", "Description", "Publisher")
-    ).to.be.revertedWith("LibDiamond: Must be contract owner");
+    ).to.be.revertedWith("LibDiamond: Must be AGC admin or contract owner");
   });
 
   it("should allow owner to update a game", async () => {
@@ -312,7 +312,7 @@ describe("GamesFacet", async function () {
       gamesFacet
         .connect(nonOwner)
         .updateGame(0, "Non-owner Update", "Description", "Publisher")
-    ).to.be.revertedWith("LibDiamond: Must be contract owner");
+    ).to.be.revertedWith("LibDiamond: Must be AGC admin or contract owner");
   });
 
   it("should return all games when no IDs are provided", async () => {
@@ -521,7 +521,7 @@ describe("BadgeFacet", async function () {
     it("only agc admins can mint badges", async function () {
       await expect(
         badgeFacet.connect(user).mintBadge(await user.getAddress(), 0)
-      ).to.be.revertedWith("LibDiamond: Must be AGC admin");
+      ).to.be.revertedWith("LibDiamond: Must be AGC admin or contract owner");
     });
 
     it("should mint a badge and badge count should be 1", async function () {
@@ -597,7 +597,7 @@ describe("BadgeFacet", async function () {
             await user.getAddress(),
             badgeIds
           )
-      ).to.be.revertedWith("LibDiamond: Must be contract owner");
+      ).to.be.revertedWith("LibDiamond: Must be AGC admin or contract owner");
     });
 
     it("should not allow normal safeTransferFrom transfers", async function () {
@@ -657,7 +657,7 @@ describe("BadgeFacet", async function () {
       const badgeId = 1;
       await expect(
         badgeFacet.connect(user).burn(await owner.getAddress(), badgeId, 1)
-      ).to.be.revertedWith("LibDiamond: Must be contract owner");
+      ).to.be.revertedWith("LibDiamond: Must be AGC admin or contract owner");
     });
 
     it("should not allow burning more than one badge at a time", async function () {

@@ -6,9 +6,8 @@ import {LibAppStorageAGC, Modifiers} from "../../libraries/LibAppStorageAGC.sol"
 contract PointsFacet is Modifiers {
     event PointsMinted(address indexed to, uint256 amount);
 
-    function mintPoints(address _to, uint256 _amount) external {
+    function mintPoints(address _to, uint256 _amount) external onlyAGCAdminOrContractOwner {
         LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
-        require(ds.agcAdmins[msg.sender], "PointsFacet: Caller is not an AGC admin");
         require(_to != address(0), "PointsFacet: Cannot mint to zero address");
         require(_amount > 0, "PointsFacet: Amount must be greater than zero");
 

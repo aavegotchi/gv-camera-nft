@@ -6,7 +6,7 @@ contract GamesFacet is Modifiers {
     event GameRegistered(uint256 indexed gameId, string title, string publisher);
     event GameUpdated(uint256 indexed gameId, string title, string publisher);
 
-    function registerGame(string memory gameTitle, string memory gameDescription, string memory publisher) external onlyContractOwner {
+    function registerGame(string memory gameTitle, string memory gameDescription, string memory publisher) external onlyAGCAdminOrContractOwner {
         require(bytes(gameTitle).length > 0, "Game title cannot be empty");
         require(bytes(gameDescription).length > 0, "Game description cannot be empty");
         require(bytes(publisher).length > 0, "Publisher cannot be empty");
@@ -26,7 +26,7 @@ contract GamesFacet is Modifiers {
         string memory _gameTitle,
         string memory _gameDescription,
         string memory _publisher
-    ) external onlyContractOwner {
+    ) external onlyAGCAdminOrContractOwner {
         LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
         LibAppStorageAGC.Game[] storage games = ds.games;
 

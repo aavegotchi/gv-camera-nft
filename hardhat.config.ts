@@ -6,6 +6,9 @@ import "@typechain/hardhat";
 require("./tasks/deployUpgrade.ts");
 require("./tasks/generateDiamondABI_agc");
 
+import * as dotenv from "dotenv";
+dotenv.config({ path: __dirname + "/.env" });
+
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
@@ -41,5 +44,51 @@ module.exports = {
         },
       },
     ],
+  },
+  networks: {
+    hardhat: {
+      // forking: {
+      //   url: process.env.AMOY_URL,
+      //   timeout: 12000000,
+      // },
+      // blockGasLimit: 20000000,
+      // timeout: 120000,
+      // gas: "auto",
+    },
+    localhost: {
+      timeout: 16000000,
+    },
+    matic: {
+      url: process.env.MATIC_URL,
+      // url: 'https://rpc-mainnet.maticvigil.com/',
+      accounts: [process.env.ITEM_MANAGER],
+      // blockGasLimit: 20000000,
+      blockGasLimit: 20000000,
+      gasPrice: 400000000000,
+      timeout: 90000,
+    },
+    amoy: {
+      url: process.env.AMOY_URL,
+      accounts: [process.env.ITEM_MANAGER],
+      gasPrice: 7000000000,
+    },
+
+    // gorli: {
+    //   url: process.env.GORLI,
+    //   accounts: [process.env.SECRET],
+    //   blockGasLimit: 20000000,
+    //   gasPrice: 2100000000
+    // },
+    // kovan: {
+    //   url: process.env.KOVAN_URL,
+    //   accounts: [process.env.SECRET],
+    //   gasPrice: 5000000000
+    // },
+    // ethereum: {
+    //   url: process.env.MAINNET_URL,
+    //   accounts: [process.env.SECRET],
+    //   blockGasLimit: 20000000,
+    //   gasPrice: 2100000000
+    // }
   },
 };

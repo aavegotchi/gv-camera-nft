@@ -4,7 +4,14 @@ import {
   DefenderRelayProvider,
   DefenderRelaySigner,
 } from "defender-relay-client/lib/ethers";
-import { DiamondLoupeFacet, OwnershipFacet } from "../src/types";
+import {
+  DiamondInit,
+  DiamondLoupeFacet,
+  IDiamondCut,
+  OwnershipFacet,
+} from "../src/types";
+import { FacetCutAction } from "./libraries/diamond";
+import { BytesLike } from "ethers";
 
 export const gasPrice = 570000000000;
 
@@ -192,4 +199,61 @@ export async function getRelayerSigner(
   } else {
     throw Error("Incorrect network selected");
   }
+}
+
+export async function cutDiamond(
+  diamondAddress: string,
+  FacetNames: string[],
+  ethers: any,
+  diamondInit: DiamondInit,
+  showDiamondCut: boolean = false
+) {
+  const cut: IDiamondCut.FacetCutStruct[] = [];
+
+  const uniqueSelectors = new Set();
+
+  for (const FacetName of FacetNames) {
+    const localSelectors = new Set();
+
+    const Facet = await ethers.getContractFactory(FacetName);
+    const facet = await Facet.deploy();
+    await facet.deployed();
+    console.log(`${FacetName} deployed: ${facet.address}`);
+
+    const selectors = getSelectors(facet);
+    for (const selector of selectors) {
+      if (uniqueSelectors.has(selector)) {
+        const functionName = facet.interface.getFunction(selector).name;
+
+        console.warn(
+          `Selector ${selector} (${functionName}) already in diamond, omitting.`
+        );
+      } else {
+        uniqueSelectors.add(selector);
+        localSelectors.add(selector);
+      }
+    }
+
+    cut.push({
+      facetAddress: facet.address,
+      action: FacetCutAction.Add,
+      functionSelectors: Array.from(localSelectors) as BytesLike[],
+    });
+  }
+
+  // upgrade diamond with facets
+  console.log("");
+  console.log("Diamond Cut:", cut);
+  const diamondCut = await ethers.getContractAt("IDiamondCut", diamondAddress);
+  let tx;
+  let receipt;
+  // call to init function
+  let functionCall = diamondInit.interface.encodeFunctionData("init");
+  tx = await diamondCut.diamondCut(cut, diamondInit.address, functionCall);
+  console.log("Diamond cut tx: ", tx.hash);
+  receipt = await tx.wait();
+  if (!receipt.status) {
+    throw Error(`Diamond upgrade failed: ${tx.hash}`);
+  }
+  console.log("Completed diamond cut");
 }

@@ -34,7 +34,7 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         string memory _gameTitle,
         string memory _title,
         string memory _description
-    ) public onlyContractOwner returns (uint256) {
+    ) public onlyAGCAdminOrContractOwner returns (uint256) {
         LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
         uint256 newBadgeId = ds.badges.length;
 
@@ -61,7 +61,7 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         string memory _gameTitle,
         string memory _title,
         string memory _description
-    ) public onlyContractOwner {
+    ) public onlyAGCAdminOrContractOwner {
         LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
         require(_badgeId >= 0 && _badgeId < ds.badges.length, "Badge does not exist");
 
@@ -80,7 +80,7 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         string[] memory _gameTitles,
         string[] memory _titles,
         string[] memory _descriptions
-    ) external onlyContractOwner returns (uint256[] memory) {
+    ) external onlyAGCAdminOrContractOwner returns (uint256[] memory) {
         require(
             _rarities.length == _gameIds.length &&
                 _gameIds.length == _gameTitles.length &&
@@ -105,7 +105,7 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         string[] memory _gameTitles,
         string[] memory _titles,
         string[] memory _descriptions
-    ) external onlyContractOwner {
+    ) external onlyAGCAdminOrContractOwner {
         require(
             _badgeIds.length == _rarities.length &&
                 _rarities.length == _gameIds.length &&
@@ -120,7 +120,7 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         }
     }
 
-    function mintBadge(address _to, uint256 _badgeId) public onlyAGCAdmin {
+    function mintBadge(address _to, uint256 _badgeId) public onlyAGCAdminOrContractOwner {
         LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
         require(_badgeId >= 0 && _badgeId < ds.badges.length, "Badge does not exist");
         require(balanceOf(_to, _badgeId) == 0, "User already owns this badge");
@@ -139,7 +139,7 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         emit BadgeMinted(_to, _badgeId);
     }
 
-    function batchMintBadges(address[] calldata _to, uint256[] calldata _badgeIds) external onlyAGCAdmin {
+    function batchMintBadges(address[] calldata _to, uint256[] calldata _badgeIds) external onlyAGCAdminOrContractOwner {
         require(_to.length == _badgeIds.length, "Input arrays must have the same length");
 
         for (uint256 i = 0; i < _to.length; i++) {
@@ -147,7 +147,7 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         }
     }
 
-    function adminTransferBadges(address _from, address _to, uint256[] calldata _badgeIds) external onlyContractOwner {
+    function adminTransferBadges(address _from, address _to, uint256[] calldata _badgeIds) external onlyAGCAdminOrContractOwner {
         for (uint256 i = 0; i < _badgeIds.length; i++) {
             require(balanceOf(_from, _badgeIds[i]) > 0, "Sender does not own this badge");
             _safeTransferFrom(_from, _to, _badgeIds[i], 1, "");
@@ -205,7 +205,7 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
             );
     }
 
-    function burn(address account, uint256 id, uint256 value) public virtual override onlyContractOwner {
+    function burn(address account, uint256 id, uint256 value) public virtual override onlyAGCAdminOrContractOwner {
         require(value == 1, "Can only burn one badge at a time");
         _burn(account, id, 1);
 
@@ -216,7 +216,7 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         badge.count -= 1; // Decrement the count by 1 when burning
     }
 
-    function burnBatch(address account, uint256[] memory ids, uint256[] memory values) public virtual override onlyContractOwner {
+    function burnBatch(address account, uint256[] memory ids, uint256[] memory values) public virtual override onlyAGCAdminOrContractOwner {
         _burnBatch(account, ids, values);
 
         LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
