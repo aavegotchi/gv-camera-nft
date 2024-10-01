@@ -7,7 +7,7 @@ const libraryBasePath = "/contracts/libraries/";
 // const sharedLibraryBasePath = "/contracts/shared/libraries/";
 
 task(
-  "diamondABI",
+  "diamondABI_agc",
   "Generates ABI file for diamond, includes all ABIs of facets"
 ).setAction(async () => {
   let files = fs.readdirSync("." + basePath);
