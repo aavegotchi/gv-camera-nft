@@ -29,7 +29,13 @@ export async function deployGPDiamond(agcDiamond: string) {
   const network = await ethers.provider.getNetwork();
   console.log("Current network: ", network.name);
 
-  if (network.name === "hardhat" || network.name === "unknown") {
+  const chainId = await network.chainId;
+
+  //amoy = 80002
+
+  //hardhat = 31337
+
+  if (chainId === 31337) {
     //deploy alchemica on local testnet
     const Alchemica = await ethers.getContractFactory("Alchemica");
     fud = (await Alchemica.deploy("Fud", "FUD")).address;
@@ -42,10 +48,11 @@ export async function deployGPDiamond(agcDiamond: string) {
     console.log("Alpha deployed: ", alpha);
     console.log("Kek deployed: ", kek);
   } else {
-    fud = networkAddresses[network.name].FUD_ADDRESS;
-    fomo = networkAddresses[network.name].FOMO_ADDRESS;
-    alpha = networkAddresses[network.name].ALPHA_ADDRESS;
-    kek = networkAddresses[network.name].KEK_ADDRESS;
+    console.log("use existing alchemica");
+    fud = networkAddresses[chainId].FUD_ADDRESS;
+    fomo = networkAddresses[chainId].FOMO_ADDRESS;
+    alpha = networkAddresses[chainId].ALPHA_ADDRESS;
+    kek = networkAddresses[chainId].KEK_ADDRESS;
   }
 
   // deploy DiamondCutFacet

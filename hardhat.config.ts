@@ -70,7 +70,7 @@ module.exports = {
     amoy: {
       url: process.env.AMOY_URL,
       accounts: [process.env.ITEM_MANAGER],
-      gasPrice: 7000000000,
+      gasPrice: 30000000000,
     },
 
     // gorli: {

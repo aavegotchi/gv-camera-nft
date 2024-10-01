@@ -18,6 +18,7 @@ export async function deployAGCDiamond() {
     contractOwner.address,
     "0xbCDe4ef0E8b16C1b691EF552FA4BBD98560b991b",
     "0xAd0CEb6Dc055477b8a737B630D6210EFa76a2265",
+    "0x1091232c61EeE86418DC93a5c895db3490386501",
   ];
 
   const realAdmins = [contractOwner.address];

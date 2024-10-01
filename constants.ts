@@ -15,8 +15,8 @@ const amoyAddresses = {
 };
 
 export const networkAddresses: { [key: string]: { [key: string]: string } } = {
-  matic: maticAddresses,
-  amoy: amoyAddresses,
+  137: maticAddresses,
+  80002: amoyAddresses,
 };
 
 export const defaultWheelWeights = [4500, 2300, 1600, 800, 250, 50, 500];

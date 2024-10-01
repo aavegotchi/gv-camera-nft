@@ -7,12 +7,16 @@ import { deployGPDiamond } from "./deployGPDiamond";
 
 export async function deployDiamonds() {
   const network = await ethers.provider.getNetwork();
-  console.log("Current network: ", network.name);
+
+  console.log("chain:", network.chainId);
 
   console.log("Deploying AGCDiamond");
   const agcDiamondAddress = await deployAGCDiamond();
   console.log("Deploying GPDiamond");
-  await deployGPDiamond(agcDiamondAddress);
+  const gpdiamondAddress = await deployGPDiamond(agcDiamondAddress);
+
+  console.log("AGCDiamond deployed: ", agcDiamondAddress);
+  console.log("GPDiamond deployed: ", gpdiamondAddress);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
