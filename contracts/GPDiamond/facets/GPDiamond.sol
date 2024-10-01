@@ -23,7 +23,9 @@ contract GPDiamond {
         address _kek,
         uint256 initialSeasonMaxPoints,
         uint256[] memory _defaultWheelWeights,
-        uint256[] memory _defaultWheelPoints
+        uint256[] memory _defaultWheelPoints,
+        //initial conversion rates
+        uint256[] memory _tokenConversonRates //fud, fomo, alpha, kek
     ) payable {
         LibDiamond.setContractOwner(_contractOwner);
 
@@ -48,6 +50,11 @@ contract GPDiamond {
         //Set the default wheel weights and points
         s.wheelWeights = _defaultWheelWeights;
         s.wheelPoints = _defaultWheelPoints;
+
+        s.tokenToConversionRate[_fud] = _tokenConversonRates[0];
+        s.tokenToConversionRate[_fomo] = _tokenConversonRates[1];
+        s.tokenToConversionRate[_alpha] = _tokenConversonRates[2];
+        s.tokenToConversionRate[_kek] = _tokenConversonRates[3];
     }
 
     // Find facet for function that is called and execute the

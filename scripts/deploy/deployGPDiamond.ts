@@ -8,6 +8,7 @@ import {
   defaultWheelWeights,
   defaultWheelPoints,
   networkAddresses,
+  initialTokenConversionRates,
 } from "../../constants";
 import { deployAGCDiamond } from "./deployAGCDiamond";
 import { IDiamondCut } from "../../src/types";
@@ -64,9 +65,10 @@ export async function deployGPDiamond(agcDiamond: string) {
     fomo,
     alpha,
     kek,
-    ethers.utils.parseEther(initialSeasonPoints),
+    initialSeasonPoints, //1,000,000,000
     defaultWheelWeights,
-    defaultWheelPoints
+    defaultWheelPoints,
+    initialTokenConversionRates
   );
   await diamond.deployed();
   console.log("Diamond deployed:", diamond.address);

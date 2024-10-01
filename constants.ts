@@ -1,3 +1,5 @@
+import { parseEther } from "ethers/lib/utils";
+
 const maticAddresses = {
   FUD_ADDRESS: "0x403e967b044d4be25170310157cb1a4bf10bdd0f",
   FOMO_ADDRESS: "0x44a6e0be76e1d9620a7f76588e4509fe4fa8e8c8",
@@ -17,7 +19,12 @@ export const networkAddresses: { [key: string]: { [key: string]: string } } = {
   amoy: amoyAddresses,
 };
 
-export const defaultWheelWeights = [50, 200, 500, 1500, 5000, 50000, 0];
+export const defaultWheelWeights = [4500, 2300, 1600, 800, 250, 50, 500];
 export const defaultWheelPoints = [50, 200, 500, 1500, 5000, 50000, 0];
-
-export const initialSeasonPoints = "1000000000";
+export const initialTokenConversionRates = [
+  parseEther("0.25"),
+  parseEther("0.5"),
+  parseEther("1"),
+  parseEther("2.5"),
+]; //need to change these to thousands so we can use decimal points
+export const initialSeasonPoints = parseEther("1000000000");
