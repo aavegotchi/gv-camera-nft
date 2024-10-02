@@ -2,9 +2,6 @@ import { task } from "hardhat/config";
 import { Signer } from "@ethersproject/abstract-signer";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { BadgeFacet } from "../src/types";
-import { ethers } from "hardhat";
-
-import * as fs from "fs";
 
 export interface AddBadgesTaskArgs {
   badgesJson: string;
@@ -13,13 +10,34 @@ export interface AddBadgesTaskArgs {
 }
 
 export type RarityType = "Bronze" | "Silver" | "Gold" | "Godlike";
+export type BadgeType = "Loyalty" | "SFA" | "GG" | "Special";
+export type BadgeCategory =
+  | "Duel Launch"
+  | "Community"
+  | "Towers"
+  | "Nests"
+  | "Eggs"
+  | "Gameplay"
+  | "Items"
+  | "Money"
+  | "Kills"
+  | "Activity"
+  | "Creation"
+  | "Hits"
+  | "Shield"
+  | "Consumables"
+  | "Special Weapons"
+  | "Logins"
+  | "Service"
+  | "Duels"
+  | "Other";
 
 //TO-DO
 const rarityMap: { [key: string]: number } = {
-  Bronze: 1,
-  Silver: 2,
-  Gold: 3,
-  Godlike: 4,
+  Bronze: 0,
+  Silver: 1,
+  Gold: 2,
+  Godlike: 3,
 };
 
 export interface BadgeData {
@@ -27,8 +45,8 @@ export interface BadgeData {
   title: string;
   imageHash: string;
   description: string;
-  type: string;
-  category: string;
+  type: BadgeType;
+  category: BadgeCategory;
   subcategory: string;
   rarity: RarityType;
   url: string;
@@ -41,9 +59,9 @@ task("addBadges", "Add new badges to the AGC Diamond")
   .setAction(
     async (taskArgs: AddBadgesTaskArgs, hre: HardhatRuntimeEnvironment) => {
       const badgesJsonPath = taskArgs.badgesJson;
-      const badgesJson: BadgeData[] = JSON.parse(
-        fs.readFileSync(badgesJsonPath, "utf8")
-      );
+      const badges: BadgeData[] = require(`../${badgesJsonPath}`).badges;
+
+      console.log("badgesJson", badges);
 
       let signer: Signer;
       const owner = taskArgs.diamondOwner;
@@ -80,43 +98,53 @@ task("addBadges", "Add new badges to the AGC Diamond")
       const titles: string[] = [];
       const descriptions: string[] = [];
       const imageUrls: string[] = [];
-      console.log(`adding: ${badgesJson.length} badges`);
+      console.log(`adding: ${badges.length} badges`);
 
-      for (const badge of badgesJson) {
+      for (const badge of badges) {
         const {
           id,
           title,
           imageHash,
           description,
           type,
-          category,
-          subcategory,
           rarity,
-          url,
+          // url,
         } = badge;
         // const badgeId = id;
 
         const gameId = 0; //TO-DO
-        const gameTitle = ""; //TO-DO
-
-        rarities.push(rarityMap[rarity]);
+        const rarityInt = rarityMap[rarity];
+        const gameTitle = type;
+        rarities.push(rarityInt);
         badgeIds.push(id);
         gameIds.push(gameId);
         gameTitles.push(gameTitle);
         titles.push(title);
         descriptions.push(description);
-        imageUrls.push(url);
+        imageUrls.push(imageHash);
       }
 
       const batchSize = 20;
-      for (let i = 0; i < badgesJson.length; i += batchSize) {
+      for (let i = 0; i < badges.length; i += batchSize) {
         const batchRarities = rarities.slice(i, i + batchSize);
+
         const batchBadgeIds = badgeIds.slice(i, i + batchSize);
         const batchGameIds = gameIds.slice(i, i + batchSize);
         const batchGameTitles = gameTitles.slice(i, i + batchSize);
         const batchTitles = titles.slice(i, i + batchSize);
         const batchDescriptions = descriptions.slice(i, i + batchSize);
         const batchImageUrls = imageUrls.slice(i, i + batchSize);
+
+        console.log(
+          batchRarities.length,
+          batchGameIds.length,
+          batchGameTitles.length,
+          batchTitles.length,
+          batchDescriptions.length,
+          batchImageUrls.length,
+          batchBadgeIds.length
+        );
+
         console.log(`Adding badges ${i} to ${i + batchSize}`);
         const tx = await badgeFacet.batchAddBadges(
           batchRarities,
@@ -129,6 +157,14 @@ task("addBadges", "Add new badges to the AGC Diamond")
         );
         await tx.wait();
       }
+
+      //get length
+      const length = await badgeFacet.getBadgesLength();
+      console.log("length", length);
+
+      const addedBadges = await badgeFacet.getBadges([]);
+      console.log("added badges", addedBadges, addedBadges.length);
+
       console.log("All badges added successfully!");
     }
   );

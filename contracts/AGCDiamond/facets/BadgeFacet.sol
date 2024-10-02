@@ -110,10 +110,12 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         string[] memory _imageUrls
     ) external onlyAGCAdminOrContractOwner returns (uint256[] memory) {
         require(
-            _rarities.length == _gameIds.length &&
+            _badgeIds.length == _rarities.length &&
+                _rarities.length == _gameIds.length &&
                 _gameIds.length == _gameTitles.length &&
                 _gameTitles.length == _titles.length &&
-                _titles.length == _descriptions.length,
+                _titles.length == _descriptions.length &&
+                _descriptions.length == _imageUrls.length,
             "Input arrays must have the same length"
         );
 
