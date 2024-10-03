@@ -28,7 +28,6 @@ task(
       removeTupleArrays,
     }: GenerateABITaskParams) => {
       function removeDuplicateEvents(inputAbi: any): AbiCoder[] {
-        const events = new Set<string>();
         const uniqueEvents = new Set<string>();
         const filteredAbi = inputAbi.filter((item: any) => {
           if (item.type === "event") {
@@ -82,31 +81,6 @@ task(
       // let finalAbi = JSON.stringify(abi);
 
       abi = removeDuplicateEvents(abi);
-
-      // for (const item of abi) {
-      //   //@ts-ignore
-      //   if (item.type === "event") {
-      //     //@ts-ignore
-      //     const eventSignature = `${item.name}(${item.inputs
-      //       //@ts-ignore
-      //       .map((input) => input.type)
-      //       .join(",")})`;
-      //     if (events.has(eventSignature)) {
-      //       console.log("Duplicate event", eventSignature);
-      //       //exclude this from the abi
-      //       abi = abi.filter(
-      //         (item: any) =>
-      //           item.type !== "event" || item.name !== eventSignature
-      //       );
-      //     }
-      //     events.add(eventSignature);
-      //   }
-      // }
-
-      // // Convert Set to array for easier use
-      // const uniqueEvents = Array.from(events);
-      // console.log("uniqueEvents", uniqueEvents);
-      // console.log(`Found ${uniqueEvents.length} unique events`);
 
       if (removeTupleArrays === "true") {
         const finalAbi = JSON.stringify(abi);
