@@ -4,8 +4,7 @@ import "@nomicfoundation/hardhat-chai-matchers";
 import "@typechain/hardhat";
 
 require("./tasks/deployUpgrade.ts");
-require("./tasks/generateDiamondABI_agc");
-require("./tasks/generateDiamondABI_gp");
+require("./tasks/generateDiamondABI");
 require("./tasks/addBadges.ts");
 
 import * as dotenv from "dotenv";

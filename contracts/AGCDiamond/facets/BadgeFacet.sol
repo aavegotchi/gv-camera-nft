@@ -160,6 +160,7 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         LibAppStorageAGC.Badge storage badge = ds.badges[_badgeId];
         uint256 points = getPointsForRarity(badge.rarity);
 
+        //todo: use PointsFacet function for this
         ds.userToPoints[_to] += points;
         //emit event
 
