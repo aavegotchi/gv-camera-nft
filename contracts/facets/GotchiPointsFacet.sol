@@ -6,7 +6,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {LibGotchiPoints} from "../libraries/LibGotchiPoints.sol";
 
 contract GotchiPointsFacet is Modifiers {
-    event PointsMinted(address indexed to, uint256 indexed season, uint256 amount);
+    event GotchiPointsMinted(address indexed to, uint256 indexed season, uint256 amount);
     event ConversionRateAdjusted(address indexed token, uint256 rate);
     event SeasonMaxPointsSet(uint256 season, uint256 maxPoints);
     event SeasonIncremented(uint256 season);
@@ -41,7 +41,7 @@ contract GotchiPointsFacet is Modifiers {
         amounts[0] = totalPoints;
         LibGotchiPoints._grantPoints(recipients, amounts);
 
-        emit PointsMinted(_recipient, s.currentSeason, totalPoints);
+        emit GotchiPointsMinted(_recipient, s.currentSeason, totalPoints);
     }
 
     function convertParcels(uint256[] calldata _parcelIds, address _recipient) external {

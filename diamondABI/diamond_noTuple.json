@@ -520,6 +520,32 @@
     "type": "function"
   },
   {
+    "inputs": [
+      { "internalType": "uint256[]", "name": "_badgeIds", "type": "uint256[]" }
+    ],
+    "name": "getBadges",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "id", "type": "uint256" },
+          { "internalType": "string", "name": "badgeId", "type": "string" },
+          { "internalType": "uint256", "name": "rarity", "type": "uint256" },
+          { "internalType": "uint256", "name": "gameId", "type": "uint256" },
+          { "internalType": "string", "name": "title", "type": "string" },
+          { "internalType": "string", "name": "description", "type": "string" },
+          { "internalType": "uint256", "name": "earnedOn", "type": "uint256" },
+          { "internalType": "uint256", "name": "count", "type": "uint256" },
+          { "internalType": "string", "name": "imageUrl", "type": "string" }
+        ],
+        "internalType": "struct LibAppStorage.Badge[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "getBadgesLength",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
@@ -722,6 +748,35 @@
   },
   {
     "inputs": [
+      { "internalType": "uint256[]", "name": "_gameIds", "type": "uint256[]" }
+    ],
+    "name": "getGames",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "gameId", "type": "uint256" },
+          { "internalType": "string", "name": "gameTitle", "type": "string" },
+          {
+            "internalType": "string",
+            "name": "gameDescription",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lastUpdated",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct LibAppStorage.Game[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
       { "internalType": "string", "name": "gameTitle", "type": "string" },
       { "internalType": "string", "name": "gameDescription", "type": "string" },
       { "internalType": "string", "name": "publisher", "type": "string" }
@@ -788,7 +843,7 @@
         "type": "uint256"
       }
     ],
-    "name": "PointsMinted",
+    "name": "GotchiPointsMinted",
     "type": "event"
   },
   {
@@ -1001,25 +1056,6 @@
     "type": "function"
   },
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "PointsMinted",
-    "type": "event"
-  },
-  {
     "inputs": [],
     "name": "adjustWheelWeights",
     "outputs": [],
@@ -1039,25 +1075,6 @@
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "SpinsGranted",
-    "type": "event"
   },
   {
     "anonymous": false,
@@ -1171,6 +1188,48 @@
     "anonymous": false,
     "inputs": [
       {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "facetAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "enum IDiamondCut.FacetCutAction",
+            "name": "action",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes4[]",
+            "name": "functionSelectors",
+            "type": "bytes4[]"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct IDiamondCut.FacetCut[]",
+        "name": "_diamondCut",
+        "type": "tuple[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_init",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "_calldata",
+        "type": "bytes"
+      }
+    ],
+    "name": "DiamondCut",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "previousOwner",
@@ -1184,44 +1243,6 @@
       }
     ],
     "name": "OwnershipTransferred",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "SpinsGranted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "pointsWon",
-        "type": "uint256"
-      }
-    ],
-    "name": "WheelSpinResult",
     "type": "event"
   }
 ]

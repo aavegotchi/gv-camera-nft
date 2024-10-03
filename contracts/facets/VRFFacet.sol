@@ -4,8 +4,6 @@ pragma solidity ^0.8.1;
 import {LibAppStorage, Modifiers} from "../libraries/LibAppStorage.sol";
 
 contract VRFFacet is Modifiers {
-    event PointsMinted(address indexed to, uint256 amount);
-
     function spinWheel() external {
         //spin the wheel
     }
