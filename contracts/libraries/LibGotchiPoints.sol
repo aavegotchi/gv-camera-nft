@@ -1,23 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {LibAppStorageGP} from "./LibAppStorageGP.sol";
-import "hardhat/console.sol";
-
+import {LibAppStorage} from "./LibAppStorage.sol";
 library LibGotchiPoints {
     event WheelSpinResult(address indexed user, uint256 pointsWon);
+    event SpinsGranted(address indexed user, uint256 amount);
 
     function _grantPoints(address[] memory _recipients, uint256[] memory _amounts) internal {
         //Adds GOTCHI points to the recipient. Only callable by the convert functions above, and the `spinWheel` function in WheelFacet.
 
-        LibAppStorageGP.AppStorageGP storage s = LibAppStorageGP.diamondStorage();
+        LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
         uint256 season = s.currentSeason;
 
         for (uint256 i = 0; i < _recipients.length; i++) {
-            s.userToPoints[_recipients[i]] += _amounts[i];
+            s.userToGotchiPoints[_recipients[i]] += _amounts[i];
             s.seasonPoints[season] += _amounts[i];
         }
-
         //check if season points is greater than season max points
         if (s.seasonPoints[season] > s.seasonToMaxPoints[season]) {
             revert("Exceeds season max points");
@@ -25,7 +23,7 @@ library LibGotchiPoints {
     }
 
     function _spinWheel(bool useSpins) internal {
-        LibAppStorageGP.AppStorageGP storage s = LibAppStorageGP.diamondStorage();
+        LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
         require(s.wheelPoints.length > 0 && s.wheelWeights.length > 0, "LibGotchiPoints: Wheel not configured");
 

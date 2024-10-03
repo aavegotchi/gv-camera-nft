@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.1;
 
-import {LibAppStorageGP, Modifiers} from "../../libraries/LibAppStorageGP.sol";
+import {LibAppStorage, Modifiers} from "../libraries/LibAppStorage.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {LibGotchiPoints} from "../../libraries/LibGotchiPoints.sol";
+import {LibGotchiPoints} from "../libraries/LibGotchiPoints.sol";
 
 contract GotchiPointsFacet is Modifiers {
     event PointsMinted(address indexed to, uint256 indexed season, uint256 amount);
@@ -12,7 +12,7 @@ contract GotchiPointsFacet is Modifiers {
     event SeasonIncremented(uint256 season);
 
     function convertAlchemica(address _recipient, uint256 _fud, uint256 _fomo, uint256 _alpha, uint256 _kek) external {
-        LibAppStorageGP.AppStorageGP storage s = LibAppStorageGP.diamondStorage();
+        LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
         // Burn Alchemica tokens from the sender
 
@@ -51,7 +51,7 @@ contract GotchiPointsFacet is Modifiers {
 
     function adjustConversionRate(uint256 _fud, uint256 _fomo, uint256 _alpha, uint256 _kek) external onlyContractOwner {
         //Adjusts the conversion rates of Alchemica to Points.
-        LibAppStorageGP.AppStorageGP storage s = LibAppStorageGP.diamondStorage();
+        LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
         s.tokenToConversionRate[s.fudContract] = _fud;
         s.tokenToConversionRate[s.fomoContract] = _fomo;
         s.tokenToConversionRate[s.alphaContract] = _alpha;
@@ -66,14 +66,14 @@ contract GotchiPointsFacet is Modifiers {
 
     function incrementSeason() external onlyContractOwner {
         //Increments the current season.
-        LibAppStorageGP.AppStorageGP storage s = LibAppStorageGP.diamondStorage();
+        LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
         s.currentSeason++;
         emit SeasonIncremented(s.currentSeason);
     }
 
     function setSeasonTotals(uint256 _season, uint256 _totalPoints) external onlyContractOwner {
         //sets the total number of points available in a Season.
-        LibAppStorageGP.AppStorageGP storage s = LibAppStorageGP.diamondStorage();
+        LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
         s.seasonToMaxPoints[_season] = _totalPoints;
 
         emit SeasonMaxPointsSet(_season, _totalPoints);
@@ -82,34 +82,34 @@ contract GotchiPointsFacet is Modifiers {
     //view functions
 
     function currentSeason() external view returns (uint256) {
-        return LibAppStorageGP.diamondStorage().currentSeason;
+        return LibAppStorage.diamondStorage().currentSeason;
     }
-    function getUserPoints(address _user) external view returns (uint256) {
-        return LibAppStorageGP.diamondStorage().userToPoints[_user];
+    function getUserGotchiPoints(address _user) external view returns (uint256) {
+        return LibAppStorage.diamondStorage().userToGotchiPoints[_user];
     }
     function getSeasonPoints(uint256 _season) external view returns (uint256) {
-        return LibAppStorageGP.diamondStorage().seasonPoints[_season];
+        return LibAppStorage.diamondStorage().seasonPoints[_season];
     }
 
     function getSeasonMaxPoints(uint256 _season) external view returns (uint256) {
-        return LibAppStorageGP.diamondStorage().seasonToMaxPoints[_season];
+        return LibAppStorage.diamondStorage().seasonToMaxPoints[_season];
     }
 
     function fudContract() external view returns (address) {
-        return LibAppStorageGP.diamondStorage().fudContract;
+        return LibAppStorage.diamondStorage().fudContract;
     }
     function fomoContract() external view returns (address) {
-        return LibAppStorageGP.diamondStorage().fomoContract;
+        return LibAppStorage.diamondStorage().fomoContract;
     }
     function alphaContract() external view returns (address) {
-        return LibAppStorageGP.diamondStorage().alphaContract;
+        return LibAppStorage.diamondStorage().alphaContract;
     }
     function kekContract() external view returns (address) {
-        return LibAppStorageGP.diamondStorage().kekContract;
+        return LibAppStorage.diamondStorage().kekContract;
     }
 
     function conversionRate(address _tokenAddress) public view returns (uint256) {
-        LibAppStorageGP.AppStorageGP storage s = LibAppStorageGP.diamondStorage();
+        LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
         return s.tokenToConversionRate[_tokenAddress];
     }
 }

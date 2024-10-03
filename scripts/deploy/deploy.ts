@@ -2,8 +2,7 @@
 /* eslint prefer-const: "off" */
 
 import { ethers } from "hardhat";
-import { deployAGCDiamond } from "./deployAGCDiamond";
-import { deployGPDiamond } from "./deployGPDiamond";
+import { deployAGCDiamond } from "./deployDiamond";
 import { uploadBadges } from "../chores/uploadBadges";
 
 export async function deployDiamonds() {
@@ -15,11 +14,8 @@ export async function deployDiamonds() {
 
   console.log("Deploying AGCDiamond");
   const agcDiamondAddress = await deployAGCDiamond();
-  console.log("Deploying GPDiamond");
-  const gpdiamondAddress = await deployGPDiamond(agcDiamondAddress);
 
   console.log("AGCDiamond deployed: ", agcDiamondAddress);
-  console.log("GPDiamond deployed: ", gpdiamondAddress);
 
   //Additional Tasks
 

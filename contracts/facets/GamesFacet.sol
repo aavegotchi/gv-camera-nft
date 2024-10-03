@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.1;
-import {Modifiers, LibAppStorageAGC} from "../../libraries/LibAppStorageAGC.sol";
+import {Modifiers, LibAppStorage} from "../libraries/LibAppStorage.sol";
 
 contract GamesFacet is Modifiers {
     event GameRegistered(uint256 indexed gameId, string title, string publisher);
@@ -11,11 +11,11 @@ contract GamesFacet is Modifiers {
         require(bytes(gameDescription).length > 0, "Game description cannot be empty");
         require(bytes(publisher).length > 0, "Publisher cannot be empty");
 
-        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
-        LibAppStorageAGC.Game[] storage games = ds.games;
+        LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
+        LibAppStorage.Game[] storage games = ds.games;
 
         uint256 gameId = games.length;
-        games.push(LibAppStorageAGC.Game({gameId: gameId, gameTitle: gameTitle, gameDescription: gameDescription, lastUpdated: block.timestamp}));
+        games.push(LibAppStorage.Game({gameId: gameId, gameTitle: gameTitle, gameDescription: gameDescription, lastUpdated: block.timestamp}));
         ds.idToGame[gameId] = games[gameId];
 
         emit GameRegistered(gameId, gameTitle, publisher);
@@ -27,12 +27,12 @@ contract GamesFacet is Modifiers {
         string memory _gameDescription,
         string memory _publisher
     ) external onlyAGCAdminOrContractOwner {
-        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
-        LibAppStorageAGC.Game[] storage games = ds.games;
+        LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
+        LibAppStorage.Game[] storage games = ds.games;
 
         require(_gameId < games.length, "Game does not exist");
 
-        LibAppStorageAGC.Game storage game = games[_gameId];
+        LibAppStorage.Game storage game = games[_gameId];
         game.gameTitle = _gameTitle;
         game.gameDescription = _gameDescription;
 
@@ -41,15 +41,15 @@ contract GamesFacet is Modifiers {
         emit GameUpdated(_gameId, _gameTitle, _publisher);
     }
 
-    function getGames(uint256[] calldata _gameIds) external view returns (LibAppStorageAGC.Game[] memory) {
-        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
-        LibAppStorageAGC.Game[] storage games = ds.games;
+    function getGames(uint256[] calldata _gameIds) external view returns (LibAppStorage.Game[] memory) {
+        LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
+        LibAppStorage.Game[] storage games = ds.games;
 
         if (_gameIds.length == 0) {
             return games;
         }
 
-        LibAppStorageAGC.Game[] memory selectedGames = new LibAppStorageAGC.Game[](_gameIds.length);
+        LibAppStorage.Game[] memory selectedGames = new LibAppStorage.Game[](_gameIds.length);
         for (uint256 i = 0; i < _gameIds.length; i++) {
             require(_gameIds[i] < games.length, "Game does not exist");
             selectedGames[i] = games[_gameIds[i]];
@@ -57,13 +57,13 @@ contract GamesFacet is Modifiers {
         return selectedGames;
     }
 
-    function getGame(uint256 _gameId) external view returns (LibAppStorageAGC.Game memory) {
-        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
+    function getGame(uint256 _gameId) external view returns (LibAppStorage.Game memory) {
+        LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
         return ds.idToGame[_gameId];
     }
 
     function getGameCount() external view returns (uint256) {
-        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
+        LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
         return ds.games.length;
     }
 }

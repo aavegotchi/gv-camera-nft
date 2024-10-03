@@ -1,39 +1,41 @@
 /* global ethers */
 /* eslint prefer-const: "off" */
 
-import { ethers } from "hardhat";
-import {
-  initialSeasonPoints,
-  defaultWheelWeights,
-  defaultWheelPoints,
-  networkAddresses,
-  initialTokenConversionRates,
-} from "../../constants";
-import { deployAGCDiamond } from "./deployAGCDiamond";
-
+import { ethers, network } from "hardhat";
 import { cutDiamond } from "../helperFunctions";
+import {
+  defaultWheelPoints,
+  defaultWheelWeights,
+  initialSeasonPoints,
+  initialTokenConversionRates,
+  networkAddresses,
+} from "../../constants";
 
-export async function deployGPDiamond(agcDiamond: string) {
-  let fud: string = ""; // Fud
-  let fomo: string = ""; // Fomo
-  let alpha: string = ""; // Alpha
-  let kek: string = ""; // Kek
-
-  if (agcDiamond === "") {
-    agcDiamond = await deployAGCDiamond();
-  }
-
+export async function deployAGCDiamond() {
   const accounts = await ethers.getSigners();
   const contractOwner = accounts[0];
+
+  // deploy DiamondCutFacet
+  const DiamondCutFacet = await ethers.getContractFactory("DiamondCutFacet");
+  const diamondCutFacet = await DiamondCutFacet.deploy();
+  await diamondCutFacet.deployed();
+  console.log("DiamondCutFacet deployed:", diamondCutFacet.address);
+
+  const testAdmins = [
+    contractOwner.address,
+    "0xbCDe4ef0E8b16C1b691EF552FA4BBD98560b991b",
+    "0xAd0CEb6Dc055477b8a737B630D6210EFa76a2265",
+    "0x1091232c61EeE86418DC93a5c895db3490386501",
+  ];
+
+  const realAdmins = [contractOwner.address];
+
+  let fud, fomo, alpha, kek;
 
   const network = await ethers.provider.getNetwork();
   console.log("Current network: ", network.name);
 
   const chainId = await network.chainId;
-
-  //amoy = 80002
-
-  //hardhat = 31337
 
   if (chainId === 31337) {
     //deploy alchemica on local testnet
@@ -55,18 +57,16 @@ export async function deployGPDiamond(agcDiamond: string) {
     kek = networkAddresses[chainId].KEK_ADDRESS;
   }
 
-  // deploy DiamondCutFacet
-  const DiamondCutFacet = await ethers.getContractFactory("DiamondCutFacet");
-  const diamondCutFacet = await DiamondCutFacet.deploy();
-  await diamondCutFacet.deployed();
-  console.log("DiamondCutFacet deployed:", diamondCutFacet.address);
-
   // deploy Diamond
-  const Diamond = await ethers.getContractFactory("GPDiamond");
+  const Diamond = await ethers.getContractFactory("AGCDiamond");
   const diamond = await Diamond.deploy(
     contractOwner.address,
     diamondCutFacet.address,
-    agcDiamond,
+    ["unknown", "hardhat", "amoy"].includes(network.name)
+      ? testAdmins
+      : realAdmins,
+
+    //gotchi points
     fud,
     fomo,
     alpha,
@@ -93,6 +93,10 @@ export async function deployGPDiamond(agcDiamond: string) {
   const FacetNames = [
     "DiamondLoupeFacet",
     "OwnershipFacet",
+    "PointsFacet",
+    "AdminFacet",
+    "GamesFacet",
+    "BadgeFacet",
     "GotchiPointsFacet",
     "WheelFacet",
   ];
@@ -105,7 +109,7 @@ export async function deployGPDiamond(agcDiamond: string) {
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 if (require.main === module) {
-  deployGPDiamond("")
+  deployAGCDiamond()
     .then(() => process.exit(0))
     .catch((error) => {
       console.error(error);
@@ -113,4 +117,4 @@ if (require.main === module) {
     });
 }
 
-exports.deployGPDiamond = deployGPDiamond;
+exports.deployAGCDiamond = deployAGCDiamond;

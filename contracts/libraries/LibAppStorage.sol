@@ -3,7 +3,7 @@ pragma solidity ^0.8.1;
 
 import {LibDiamond} from "./LibDiamond.sol";
 
-library LibAppStorageAGC {
+library LibAppStorage {
     struct Game {
         uint256 gameId;
         string gameTitle;
@@ -23,17 +23,34 @@ library LibAppStorageAGC {
         string imageUrl;
     }
 
-    struct AppStorageAGC {
+    struct AppStorage {
         //Aavegotchi Gaming Console
         mapping(address => bool) agcAdmins;
         address gpDiamond;
-        mapping(address => uint256) userToPoints;
+        mapping(address => uint256) userToAGCPoints;
         Game[] games;
         mapping(uint256 => Game) idToGame;
         Badge[] badges;
+        //
+        //GOTCHI Points
+        //
+        address agcDiamond;
+        address fudContract;
+        address fomoContract;
+        address alphaContract;
+        address kekContract;
+        uint256 currentSeason;
+        mapping(uint256 => uint256) seasonToMaxPoints;
+        mapping(address => uint256) userToSpinsRemaining;
+        mapping(uint256 => uint256) seasonPoints;
+        mapping(address => uint256) userToGotchiPoints;
+        mapping(address => uint256) tokenToConversionRate;
+        uint256[] wheelPoints; // 0 - 50000
+        uint256[] wheelWeights; // 0 - 100
+        mapping(address => uint256) userToSpins;
     }
 
-    function diamondStorage() internal pure returns (AppStorageAGC storage ds) {
+    function diamondStorage() internal pure returns (AppStorage storage ds) {
         assembly {
             ds.slot := 0
         }
@@ -47,13 +64,13 @@ contract Modifiers {
     }
 
     modifier onlyAGCAdmin() {
-        require(LibAppStorageAGC.diamondStorage().agcAdmins[msg.sender], "LibDiamond: Must be AGC admin");
+        require(LibAppStorage.diamondStorage().agcAdmins[msg.sender], "LibDiamond: Must be AGC admin");
         _;
     }
 
     modifier onlyAGCAdminOrContractOwner() {
         require(
-            msg.sender == LibDiamond.contractOwner() || LibAppStorageAGC.diamondStorage().agcAdmins[msg.sender],
+            msg.sender == LibDiamond.contractOwner() || LibAppStorage.diamondStorage().agcAdmins[msg.sender],
             "LibDiamond: Must be AGC admin or contract owner"
         );
         _;

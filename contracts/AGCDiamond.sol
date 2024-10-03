@@ -8,15 +8,15 @@ pragma solidity ^0.8.0;
 * Implementation of a diamond.
 /******************************************************************************/
 
-import {LibDiamond} from "../../libraries/LibDiamond.sol";
-import {IDiamondCut} from "../../interfaces/IDiamondCut.sol";
-import {LibAppStorageGP} from "../../libraries/LibAppStorageGP.sol";
+import {LibDiamond} from "./libraries/LibDiamond.sol";
+import {IDiamondCut} from "./interfaces/IDiamondCut.sol";
+import {LibAppStorage} from "./libraries/LibAppStorage.sol";
 
-contract GPDiamond {
+contract AGCDiamond {
     constructor(
         address _contractOwner,
         address _diamondCutFacet,
-        address _agcDiamond,
+        address[] memory _agcAdmins,
         address _fud,
         address _fomo,
         address _alpha,
@@ -36,25 +36,32 @@ contract GPDiamond {
         cut[0] = IDiamondCut.FacetCut({facetAddress: _diamondCutFacet, action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors});
         LibDiamond.diamondCut(cut, address(0), "");
 
+        //set first agc admin
+        LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
+
+        for (uint256 i = 0; i < _agcAdmins.length; i++) {
+            ds.agcAdmins[_agcAdmins[i]] = true;
+        }
+
+        //GOTCHI Points
         //set the alchemica addresses
-        LibAppStorageGP.AppStorageGP storage s = LibAppStorageGP.diamondStorage();
-        s.agcDiamond = _agcDiamond;
-        s.fudContract = _fud;
-        s.fomoContract = _fomo;
-        s.alphaContract = _alpha;
-        s.kekContract = _kek;
+
+        ds.fudContract = _fud;
+        ds.fomoContract = _fomo;
+        ds.alphaContract = _alpha;
+        ds.kekContract = _kek;
 
         //Set the initial season pointd
-        s.seasonToMaxPoints[0] = initialSeasonMaxPoints;
+        ds.seasonToMaxPoints[0] = initialSeasonMaxPoints;
 
         //Set the default wheel weights and points
-        s.wheelWeights = _defaultWheelWeights;
-        s.wheelPoints = _defaultWheelPoints;
+        ds.wheelWeights = _defaultWheelWeights;
+        ds.wheelPoints = _defaultWheelPoints;
 
-        s.tokenToConversionRate[_fud] = _tokenConversonRates[0];
-        s.tokenToConversionRate[_fomo] = _tokenConversonRates[1];
-        s.tokenToConversionRate[_alpha] = _tokenConversonRates[2];
-        s.tokenToConversionRate[_kek] = _tokenConversonRates[3];
+        ds.tokenToConversionRate[_fud] = _tokenConversonRates[0];
+        ds.tokenToConversionRate[_fomo] = _tokenConversonRates[1];
+        ds.tokenToConversionRate[_alpha] = _tokenConversonRates[2];
+        ds.tokenToConversionRate[_kek] = _tokenConversonRates[3];
     }
 
     // Find facet for function that is called and execute the

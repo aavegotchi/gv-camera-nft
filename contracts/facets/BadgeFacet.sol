@@ -4,10 +4,11 @@ pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
-import {LibAppStorageAGC, Modifiers} from "../../libraries/LibAppStorageAGC.sol";
+import {LibAppStorage, Modifiers} from "../libraries/LibAppStorage.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
-import {WheelFacet} from "../../GPDiamond/facets/WheelFacet.sol";
+import {WheelFacet} from "./WheelFacet.sol";
+import {LibGotchiPoints} from "../libraries/LibGotchiPoints.sol";
 
 contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
     event BadgeAdded(
@@ -55,12 +56,12 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         string memory _description,
         string memory _imageUrl
     ) public onlyAGCAdminOrContractOwner returns (uint256) {
-        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
+        LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
         uint256 newId = ds.badges.length;
 
         ds.badges.push(
             //change numeric badgegid to id and uid to badgeId
-            LibAppStorageAGC.Badge({
+            LibAppStorage.Badge({
                 id: newId,
                 rarity: _rarity,
                 badgeId: _badgeId,
@@ -88,10 +89,10 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         string memory _description,
         string memory _imageUrl
     ) public onlyAGCAdminOrContractOwner {
-        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
+        LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
         require(_id >= 0 && _id < ds.badges.length, "Badge does not exist");
 
-        LibAppStorageAGC.Badge storage badge = ds.badges[_id];
+        LibAppStorage.Badge storage badge = ds.badges[_id];
         badge.rarity = _rarity;
         badge.gameId = _gameId;
         badge.title = _title;
@@ -153,22 +154,24 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
     }
 
     function mintBadge(address _to, uint256 _badgeId) public onlyAGCAdminOrContractOwner {
-        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
+        LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
         require(_badgeId >= 0 && _badgeId < ds.badges.length, "Badge does not exist");
         require(balanceOf(_to, _badgeId) == 0, "User already owns this badge");
 
-        LibAppStorageAGC.Badge storage badge = ds.badges[_badgeId];
+        LibAppStorage.Badge storage badge = ds.badges[_badgeId];
         uint256 points = getPointsForRarity(badge.rarity);
 
         //todo: use PointsFacet function for this
-        ds.userToPoints[_to] += points;
+        ds.userToAGCPoints[_to] += points;
         //emit event
 
         badge.earnedOn = block.timestamp;
         badge.count++; // Increment the count when minting
 
-        WheelFacet wheelFacet = WheelFacet(address(ds.gpDiamond));
-        wheelFacet.grantSpins(_to, badge.rarity);
+        WheelFacet wheelFacet = WheelFacet(address(this));
+        uint256 spinsToGrant = wheelFacet.getSpinsForBadge(badge.rarity);
+        ds.userToSpins[_to] += spinsToGrant;
+        emit LibGotchiPoints.SpinsGranted(_to, spinsToGrant);
 
         _mint(_to, _badgeId, 1, "");
         emit BadgeMinted(_to, _badgeId);
@@ -189,14 +192,14 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         }
     }
 
-    function getBadges(uint256[] memory _badgeIds) external view returns (LibAppStorageAGC.Badge[] memory) {
-        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
+    function getBadges(uint256[] memory _badgeIds) external view returns (LibAppStorage.Badge[] memory) {
+        LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
 
         if (_badgeIds.length == 0) {
             return ds.badges;
         }
 
-        LibAppStorageAGC.Badge[] memory requestedBadges = new LibAppStorageAGC.Badge[](_badgeIds.length);
+        LibAppStorage.Badge[] memory requestedBadges = new LibAppStorage.Badge[](_badgeIds.length);
 
         for (uint256 i = 0; i < _badgeIds.length; i++) {
             require(_badgeIds[i] >= 0 && _badgeIds[i] < ds.badges.length, "Badge does not exist");
@@ -207,15 +210,15 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
     }
 
     function getBadgesLength() external view returns (uint256) {
-        return LibAppStorageAGC.diamondStorage().badges.length;
+        return LibAppStorage.diamondStorage().badges.length;
     }
 
     // Add this new function to generate the token URI
     function uri(uint256 _tokenId) public view override returns (string memory) {
-        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
+        LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
         require(_tokenId < ds.badges.length, "Badge does not exist");
 
-        LibAppStorageAGC.Badge memory badge = ds.badges[_tokenId];
+        LibAppStorage.Badge memory badge = ds.badges[_tokenId];
 
         return
             string(
@@ -249,22 +252,22 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         require(value == 1, "Can only burn one badge at a time");
         _burn(account, id, 1);
 
-        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
-        LibAppStorageAGC.Badge storage badge = ds.badges[id];
+        LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
+        LibAppStorage.Badge storage badge = ds.badges[id];
         uint256 points = getPointsForRarity(badge.rarity);
-        ds.userToPoints[account] -= points;
+        ds.userToAGCPoints[account] -= points;
         badge.count -= 1; // Decrement the count by 1 when burning
     }
 
     function burnBatch(address account, uint256[] memory ids, uint256[] memory values) public virtual override onlyAGCAdminOrContractOwner {
         _burnBatch(account, ids, values);
 
-        LibAppStorageAGC.AppStorageAGC storage ds = LibAppStorageAGC.diamondStorage();
+        LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
         for (uint256 i = 0; i < ids.length; i++) {
             require(values[i] == 1, "Can only burn one badge at a time");
-            LibAppStorageAGC.Badge storage badge = ds.badges[ids[i]];
+            LibAppStorage.Badge storage badge = ds.badges[ids[i]];
             uint256 points = getPointsForRarity(badge.rarity);
-            ds.userToPoints[account] -= points * values[i];
+            ds.userToAGCPoints[account] -= points * values[i];
             badge.count -= values[i]; // Decrement the count when burning
         }
     }
@@ -278,7 +281,7 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         else return 0;
     }
 
-    function getUserPoints(address user) external view returns (uint256) {
-        return LibAppStorageAGC.diamondStorage().userToPoints[user];
+    function getUserAGCPoints(address user) external view returns (uint256) {
+        return LibAppStorage.diamondStorage().userToAGCPoints[user];
     }
 }

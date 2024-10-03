@@ -2,7 +2,7 @@ import { Contract, Signer } from "ethers";
 import { ethers } from "hardhat";
 //@ts-ignore
 import { describe, it, before } from "mocha";
-import { deployAGCDiamond } from "../scripts/deploy/deployAGCDiamond";
+import { deployAGCDiamond } from "../scripts/deploy/deployDiamond";
 import { getSelectors } from "../scripts/libraries/diamond";
 import { expect } from "chai";
 import {
@@ -15,12 +15,10 @@ import {
   PointsFacet,
 } from "../src/types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { deployGPDiamond } from "../scripts/deploy/deployGPDiamond";
 
 const { assert } = require("chai");
 
 let diamondAddress: string;
-let gpAddress: string;
 let diamondCutFacet: DiamondCutFacet;
 let diamondLoupeFacet: DiamondLoupeFacet;
 let ownershipFacet: OwnershipFacet;
@@ -31,7 +29,6 @@ describe("DiamondTest", async function () {
   before(async function () {
     //Deploy both diamonds
     diamondAddress = await deployAGCDiamond();
-    gpAddress = await deployGPDiamond(diamondAddress);
 
     diamondCutFacet = await ethers.getContractAt(
       "DiamondCutFacet",
@@ -47,12 +44,12 @@ describe("DiamondTest", async function () {
     );
   });
 
-  it("should have three facets -- call to facetAddresses function", async () => {
+  it("should have nine facets -- call to facetAddresses function", async () => {
     for (const address of await diamondLoupeFacet.facetAddresses()) {
       addresses.push(address);
     }
 
-    assert.equal(addresses.length, 7);
+    assert.equal(addresses.length, 9);
   });
 
   it("facets should have the right function selectors -- call to facetFunctionSelectors function", async () => {
@@ -94,7 +91,7 @@ describe("DiamondTest", async function () {
 
   it("should return the correct facets for the diamond", async () => {
     const facets = await diamondLoupeFacet.facets();
-    expect(facets.length).to.equal(7);
+    expect(facets.length).to.equal(9);
     // You can add more specific checks for each facet if needed
   });
 });
@@ -116,12 +113,6 @@ describe("AdminFacet", async function () {
       "AdminFacet",
       diamondAddress
     )) as AdminFacet;
-  });
-
-  it("should set gp address in agcdiamond", async () => {
-    await adminFacet.connect(owner).setGPDiamond(gpAddress);
-    const gpDiamond = await adminFacet.gpDiamond();
-    expect(gpDiamond).to.equal(gpAddress);
   });
 
   it("should allow the contract owner to set an admin", async () => {
@@ -663,7 +654,7 @@ describe("BadgeFacet", async function () {
       }
 
       // Get initial points and badge count
-      const initialPoints = await badgeFacet.getUserPoints(ownerAddress);
+      const initialPoints = await badgeFacet.getUserAGCPoints(ownerAddress);
       const initialBadge = (await badgeFacet.getBadges([badgeId]))[0];
       const initialCount = initialBadge.count.toNumber();
 
@@ -680,7 +671,7 @@ describe("BadgeFacet", async function () {
       expect(newOwnerBalance).to.equal(0);
 
       // Verify points have been updated
-      const finalPoints = await badgeFacet.getUserPoints(ownerAddress);
+      const finalPoints = await badgeFacet.getUserAGCPoints(ownerAddress);
       expect(finalPoints).to.equal(initialPoints.sub(pointsForRarity));
 
       // Verify badge count has been lowered

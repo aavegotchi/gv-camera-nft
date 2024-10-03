@@ -1,28 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.1;
 
-import {LibAppStorageGP, Modifiers} from "../../libraries/LibAppStorageGP.sol";
-import {GotchiPointsFacet} from "./GotchiPointsFacet.sol";
-import {LibGotchiPoints} from "../../libraries/LibGotchiPoints.sol";
+import {LibAppStorage, Modifiers} from "../libraries/LibAppStorage.sol";
+import {LibGotchiPoints} from "../libraries/LibGotchiPoints.sol";
 
 contract WheelFacet is Modifiers {
     event WheelWeightsAdjusted(uint256[] wheelWeights, uint256[] wheelPoints);
 
-    event SpinsGranted(address indexed user, uint256 amount);
-
-    function agcDiamond() external view returns (address) {
-        return LibAppStorageGP.diamondStorage().agcDiamond;
-    }
-
-    function grantSpins(address _user, uint256 _rarity) public onlyAGCDiamond {
-        LibAppStorageGP.AppStorageGP storage s = LibAppStorageGP.diamondStorage();
-        uint256 spinsToGrant = getSpinsForBadge(_rarity);
-        s.userToSpins[_user] += spinsToGrant;
-        emit SpinsGranted(_user, spinsToGrant);
-    }
-
     function spinWheel() external {
         LibGotchiPoints._spinWheel(true);
+    }
+
+    function grantSpins(address _user, uint256 _rarity) public onlyAGCAdminOrContractOwner {
+        LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+        uint256 spinsToGrant = getSpinsForBadge(_rarity);
+        s.userToSpins[_user] += spinsToGrant;
+        emit LibGotchiPoints.SpinsGranted(_user, spinsToGrant);
     }
 
     function testSpinWheel() external onlyContractOwner {
@@ -31,7 +24,7 @@ contract WheelFacet is Modifiers {
     }
 
     function adjustWheelWeights(uint256[] calldata _wheelWeights, uint256[] calldata _wheelPoints) external onlyContractOwner {
-        LibAppStorageGP.AppStorageGP storage s = LibAppStorageGP.diamondStorage();
+        LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
         //check that the arrays are the same length
         require(_wheelPoints.length == _wheelWeights.length, "WheelFacet: Arrays must be the same length");
@@ -52,12 +45,12 @@ contract WheelFacet is Modifiers {
 
     function getWheelWeights() external view returns (uint256[] memory, uint256[] memory) {
         //view the wheel weights
-        LibAppStorageGP.AppStorageGP storage s = LibAppStorageGP.diamondStorage();
+        LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
         return (s.wheelWeights, s.wheelPoints);
     }
 
     function getUserSpins(address _user) external view returns (uint256) {
-        return LibAppStorageGP.diamondStorage().userToSpins[_user];
+        return LibAppStorage.diamondStorage().userToSpins[_user];
     }
 
     function getSpinsForBadge(uint256 rarity) public pure returns (uint256) {

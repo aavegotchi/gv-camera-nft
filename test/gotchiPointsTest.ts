@@ -1,28 +1,23 @@
-import { Contract } from "ethers";
 import { ethers } from "hardhat";
 //@ts-ignore
 import { describe, it, before } from "mocha";
-import { deployGPDiamond } from "../scripts/deploy/deployGPDiamond";
 import { getSelectors } from "../scripts/libraries/diamond";
 import { expect } from "chai";
 import {
-  AdminFacet,
   Alchemica,
   DiamondCutFacet,
   DiamondLoupeFacet,
   GotchiPointsFacet,
   OwnershipFacet,
-  VRFFacet,
   WheelFacet,
 } from "../src/types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { parseEther } from "ethers/lib/utils";
-import { deployAGCDiamond } from "../scripts/deploy/deployAGCDiamond";
+import { deployAGCDiamond } from "../scripts/deploy/deployDiamond";
 
 const { assert } = require("chai");
 
 let agcDiamondAddress: string;
-let gpDiamondAddress: string;
 let diamondCutFacet: DiamondCutFacet;
 let diamondLoupeFacet: DiamondLoupeFacet;
 let ownershipFacet: OwnershipFacet;
@@ -34,18 +29,17 @@ describe("DiamondTest", async function () {
   before(async function () {
     agcDiamondAddress = await deployAGCDiamond();
 
-    gpDiamondAddress = await deployGPDiamond(agcDiamondAddress);
     diamondCutFacet = await ethers.getContractAt(
       "DiamondCutFacet",
-      gpDiamondAddress
+      agcDiamondAddress
     );
     diamondLoupeFacet = await ethers.getContractAt(
       "DiamondLoupeFacet",
-      gpDiamondAddress
+      agcDiamondAddress
     );
     ownershipFacet = await ethers.getContractAt(
       "OwnershipFacet",
-      gpDiamondAddress
+      agcDiamondAddress
     );
   });
 
@@ -54,7 +48,7 @@ describe("DiamondTest", async function () {
       addresses.push(address);
     }
 
-    assert.equal(addresses.length, 5);
+    assert.equal(addresses.length, 9);
   });
 
   it("facets should have the right function selectors -- call to facetFunctionSelectors function", async () => {
@@ -96,7 +90,7 @@ describe("DiamondTest", async function () {
 
   it("should return the correct facets for the diamond", async () => {
     const facets = await diamondLoupeFacet.facets();
-    expect(facets.length).to.equal(5);
+    expect(facets.length).to.equal(9);
     // You can add more specific checks for each facet if needed
   });
 });
@@ -112,7 +106,7 @@ describe("GotchiPointsFacet", async function () {
     [owner, nonOwner, admin1, admin2] = await ethers.getSigners();
     gotchiPointsFacet = await ethers.getContractAt(
       "GotchiPointsFacet",
-      gpDiamondAddress
+      agcDiamondAddress
     );
 
     //Set the GP Diamond address in the AGCDiamond
@@ -120,16 +114,9 @@ describe("GotchiPointsFacet", async function () {
       "AdminFacet",
       agcDiamondAddress
     );
-    await adminFacet.connect(owner).setGPDiamond(gpDiamondAddress);
+    await adminFacet.connect(owner).setGPDiamond(agcDiamondAddress);
 
-    expect(await adminFacet.gpDiamond()).to.equal(gpDiamondAddress);
-
-    //check agc diamond address in wheel facet
-    const wheelFacet = await ethers.getContractAt(
-      "WheelFacet",
-      gpDiamondAddress
-    );
-    expect(await wheelFacet.agcDiamond()).to.equal(agcDiamondAddress);
+    expect(await adminFacet.gpDiamond()).to.equal(agcDiamondAddress);
 
     //set agc admins
     const agcAdmins = [owner.address, admin1.address, admin2.address];
@@ -185,17 +172,17 @@ describe("GotchiPointsFacet", async function () {
       await kek.mint(nonOwner.address, amount);
 
       // Approve the diamond contract to spend tokens
-      await fud.connect(nonOwner).approve(gpDiamondAddress, amount);
-      await fomo.connect(nonOwner).approve(gpDiamondAddress, amount);
-      await alpha.connect(nonOwner).approve(gpDiamondAddress, amount);
-      await kek.connect(nonOwner).approve(gpDiamondAddress, amount);
+      await fud.connect(nonOwner).approve(agcDiamondAddress, amount);
+      await fomo.connect(nonOwner).approve(agcDiamondAddress, amount);
+      await alpha.connect(nonOwner).approve(agcDiamondAddress, amount);
+      await kek.connect(nonOwner).approve(agcDiamondAddress, amount);
 
       // Get initial balances
       const initialFudBalance = await fud.balanceOf(nonOwner.address);
       const initialFomoBalance = await fomo.balanceOf(nonOwner.address);
       const initialAlphaBalance = await alpha.balanceOf(nonOwner.address);
       const initialKekBalance = await kek.balanceOf(nonOwner.address);
-      const initialPoints = await gotchiPointsFacet.getUserPoints(
+      const initialPoints = await gotchiPointsFacet.getUserGotchiPoints(
         nonOwner.address
       );
 
@@ -233,7 +220,7 @@ describe("GotchiPointsFacet", async function () {
         .add(ethers.utils.parseEther("40").mul(4));
 
       // Check that points were minted to the wallet and increased in the contract
-      const finalPoints = await gotchiPointsFacet.getUserPoints(
+      const finalPoints = await gotchiPointsFacet.getUserGotchiPoints(
         nonOwner.address
       );
 
@@ -379,7 +366,7 @@ describe("GotchiPointsFacet", async function () {
       // Mint tokens to user
       const tokenAmount = initialMaxPoints.add(1); // Slightly more than max points
       await fud.mint(admin1.address, tokenAmount);
-      await fud.connect(admin1).approve(gpDiamondAddress, tokenAmount);
+      await fud.connect(admin1).approve(agcDiamondAddress, tokenAmount);
 
       // Convert tokens to points
       await expect(
@@ -389,7 +376,9 @@ describe("GotchiPointsFacet", async function () {
       ).to.be.revertedWith("Exceeds season max points");
 
       // Verify points were not added
-      const userPoints = await gotchiPointsFacet.getUserPoints(admin1.address);
+      const userPoints = await gotchiPointsFacet.getUserGotchiPoints(
+        admin1.address
+      );
       expect(userPoints).to.equal(0);
 
       // Convert tokens up to max points
@@ -400,7 +389,7 @@ describe("GotchiPointsFacet", async function () {
       ).to.not.be.reverted;
 
       // Verify points were added
-      const finalUserPoints = await gotchiPointsFacet.getUserPoints(
+      const finalUserPoints = await gotchiPointsFacet.getUserGotchiPoints(
         admin1.address
       );
       expect(finalUserPoints).to.equal(initialMaxPoints);
@@ -437,7 +426,7 @@ describe("GotchiPointsFacet", async function () {
 describe("WheelFacet", async function () {
   before(async () => {
     [owner, nonOwner, admin1, admin2] = await ethers.getSigners();
-    wheelFacet = await ethers.getContractAt("WheelFacet", gpDiamondAddress);
+    wheelFacet = await ethers.getContractAt("WheelFacet", agcDiamondAddress);
   });
 
   it("admin should be able to adjust wheel weights and wheel points", async () => {
@@ -512,10 +501,10 @@ describe("spinning the wheel", async function () {
     const userAddress = admin1.address;
     const rarity = 1;
 
-    // Attempt to call grantSpins from a non-AGC Diamond address
+    // Attempt to call grantSpins from a non-admin Diamond address
     await expect(
       wheelFacet.connect(nonAGCDiamondSigner).grantSpins(userAddress, rarity)
-    ).to.be.revertedWith("LibAppStorageGP: Must be AGC Diamond");
+    ).to.be.revertedWith("LibDiamond: Must be AGC admin or contract owner");
 
     // Verify that spins were not granted
     const spinsAfterAttempt = await wheelFacet.getUserSpins(userAddress);
@@ -534,7 +523,9 @@ describe("spinning the wheel", async function () {
 
     // Get initial spins and points
     const initialSpins = await wheelFacet.getUserSpins(userAddress);
-    const initialPoints = await gotchiPointsFacet.getUserPoints(userAddress);
+    const initialPoints = await gotchiPointsFacet.getUserGotchiPoints(
+      userAddress
+    );
 
     expect(initialSpins).to.be.gt(0);
 
@@ -546,7 +537,9 @@ describe("spinning the wheel", async function () {
     expect(finalSpins).to.equal(initialSpins.sub(1));
 
     // Check if points were awarded
-    const finalPoints = await gotchiPointsFacet.getUserPoints(userAddress);
+    const finalPoints = await gotchiPointsFacet.getUserGotchiPoints(
+      userAddress
+    );
     expect(finalPoints).to.be.gt(initialPoints);
 
     // Verify the WheelSpinResult event was emitted
