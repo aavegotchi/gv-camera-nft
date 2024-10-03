@@ -2,10 +2,10 @@ import { run } from "hardhat";
 
 async function generateABI_AGC() {
   await run("diamondABI", {
-    basePath: "/contracts/AGCDiamond/facets/",
+    basePath: "/contracts/facets/",
     libraryBasePath: "/contracts/libraries/",
-    exportPath: "./diamondABI/diamond_agc.json",
-    removeTupleArrays: "false",
+    exportPath: "./diamondABI/diamond.json",
+    removeTupleArrays: "true",
   });
 }
 
