@@ -124,7 +124,7 @@ task("addBadges", "Add new badges to the AGC Diamond")
         imageUrls.push(imageHash);
       }
 
-      const batchSize = 20;
+      const batchSize = 50;
       for (let i = 0; i < badges.length; i += batchSize) {
         const batchRarities = rarities.slice(i, i + batchSize);
 
@@ -162,8 +162,8 @@ task("addBadges", "Add new badges to the AGC Diamond")
       const length = await badgeFacet.getBadgesLength();
       console.log("length", length);
 
-      const addedBadges = await badgeFacet.getBadges([]);
-      console.log("added badges", addedBadges, addedBadges.length);
+      // const addedBadges = await badgeFacet.getBadges([]);
+      // console.log("added badges", addedBadges, addedBadges.length);
 
       console.log("All badges added successfully!");
     }
