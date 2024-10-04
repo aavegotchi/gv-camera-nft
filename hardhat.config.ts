@@ -6,6 +6,7 @@ import "@typechain/hardhat";
 require("./tasks/deployUpgrade.ts");
 require("./tasks/generateDiamondABI");
 require("./tasks/addBadges.ts");
+require("./tasks/mintBadges.ts");
 
 import * as dotenv from "dotenv";
 dotenv.config({ path: __dirname + "/.env" });

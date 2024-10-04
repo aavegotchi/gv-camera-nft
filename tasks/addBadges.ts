@@ -162,9 +162,6 @@ task("addBadges", "Add new badges to the AGC Diamond")
       const length = await badgeFacet.getBadgesLength();
       console.log("length", length);
 
-      // const addedBadges = await badgeFacet.getBadges([]);
-      // console.log("added badges", addedBadges, addedBadges.length);
-
       console.log("All badges added successfully!");
     }
   );
