@@ -230,7 +230,7 @@ describe("GotchiPointsFacet", async function () {
 
       // Check for PointsMinted event
       await expect(tx)
-        .to.emit(gotchiPointsFacet, "PointsMinted")
+        .to.emit(gotchiPointsFacet, "GotchiPointsMinted")
         .withArgs(nonOwner.address, season, expectedPoints);
     });
   });
@@ -283,7 +283,7 @@ describe("GotchiPointsFacet", async function () {
       const season = await gotchiPointsFacet.currentSeason();
 
       await expect(tx)
-        .to.emit(gotchiPointsFacet, "PointsMinted")
+        .to.emit(gotchiPointsFacet, "GotchiPointsMinted")
         .withArgs(nonOwner.address, season, expectedPoints);
 
       // Ensure only owner can adjust rates

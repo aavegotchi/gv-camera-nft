@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 import {WheelFacet} from "./WheelFacet.sol";
 import {LibGotchiPoints} from "../libraries/LibGotchiPoints.sol";
+import {LibAGCPoints} from "../libraries/LibAGCPoints.sol";
 
 contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
     event BadgeAdded(
@@ -161,9 +162,7 @@ contract BadgeFacet is ERC1155, ERC1155Burnable, Modifiers {
         LibAppStorage.Badge storage badge = ds.badges[_badgeId];
         uint256 points = getPointsForRarity(badge.rarity);
 
-        //todo: use PointsFacet function for this
-        ds.userToAGCPoints[_to] += points;
-        //emit event
+        LibAGCPoints._mintPoints(_to, points);
 
         badge.earnedOn = block.timestamp;
         badge.count++; // Increment the count when minting

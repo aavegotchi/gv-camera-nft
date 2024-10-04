@@ -2,17 +2,13 @@
 pragma solidity ^0.8.1;
 
 import {LibAppStorage, Modifiers} from "../libraries/LibAppStorage.sol";
+import {LibAGCPoints} from "../libraries/LibAGCPoints.sol";
 
 contract PointsFacet is Modifiers {
-    event PointsMinted(address indexed to, uint256 amount);
-
     function mintPoints(address _to, uint256 _amount) public onlyAGCAdminOrContractOwner {
-        LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
         require(_to != address(0), "PointsFacet: Cannot mint to zero address");
         require(_amount > 0, "PointsFacet: Amount must be greater than zero");
-
-        ds.userToAGCPoints[_to] += _amount;
-        emit PointsMinted(_to, _amount);
+        LibAGCPoints._mintPoints(_to, _amount);
     }
 
     //batch version

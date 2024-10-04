@@ -12,11 +12,19 @@ const amoyAddresses = {
   FOMO_ADDRESS: "0x616d6Df54A9754B81aa43971794D86B3C229fA8B",
   ALPHA_ADDRESS: "0x44bca9B7C2C5F9f47D4da5B72deCdcF3a42535d8",
   KEK_ADDRESS: "0x9b39452041aCe85C03D3Ae76D0D5ccFf3a86dEc9",
+  AGC_ADDRESS: "0xBf757a8A1Cf10F2c6D9f591eDF00E6ce4F22D249",
 };
+
+const hardhatAddresses = {
+  AGC_ADDRESS: "0xBf757a8A1Cf10F2c6D9f591eDF00E6ce4F22D249",
+};
+
+export const itemManagerHw = "0x8D46fd7160940d89dA026D59B2e819208E714E82";
 
 export const networkAddresses: { [key: string]: { [key: string]: string } } = {
   137: maticAddresses,
   80002: amoyAddresses,
+  31337: hardhatAddresses,
 };
 
 export const defaultWheelWeights = [4500, 2300, 1600, 800, 250, 50, 500];

@@ -121,7 +121,6 @@ task(
 
       const branch = require("git-branch");
 
-      console.log("branch:", branch);
       if (hre.network.name === "matic" && branch.sync() !== "master") {
         throw new Error("Not master branch!");
       }
@@ -154,6 +153,10 @@ task(
 
         signer = await hre.ethers.getSigner(owner);
       } else if (hre.network.name === "matic") {
+        if (useLedger) {
+          signer = new LedgerSigner(hre.ethers.provider, "m/44'/60'/1'/0/0");
+        } else signer = (await hre.ethers.getSigners())[0];
+      } else if (hre.network.name === "amoy") {
         if (useLedger) {
           signer = new LedgerSigner(hre.ethers.provider, "m/44'/60'/1'/0/0");
         } else signer = (await hre.ethers.getSigners())[0];
