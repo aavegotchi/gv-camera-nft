@@ -48,15 +48,15 @@ module.exports = {
     ],
   },
   networks: {
-    hardhat: {
-      // forking: {
-      //   url: process.env.AMOY_URL,
-      //   timeout: 12000000,
-      // },
-      // blockGasLimit: 20000000,
-      // timeout: 120000,
-      // gas: "auto",
-    },
+    // hardhat: {
+    //   forking: {
+    //     url: process.env.POLTER_URL,
+    //     timeout: 12000000,
+    //   },
+    //   blockGasLimit: 20000000,
+    //   timeout: 120000,
+    //   gas: "auto",
+    // },
     localhost: {
       timeout: 16000000,
     },
@@ -72,6 +72,11 @@ module.exports = {
     amoy: {
       url: process.env.AMOY_URL,
       accounts: [process.env.ITEM_MANAGER],
+      gasPrice: 30000000000,
+    },
+    polter: {
+      url: process.env.POLTER_URL,
+      accounts: [process.env.POLTER_DEPLOYER],
       gasPrice: 30000000000,
     },
 

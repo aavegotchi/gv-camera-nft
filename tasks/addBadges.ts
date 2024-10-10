@@ -61,6 +61,9 @@ task("addBadges", "Add new badges to the AGC Diamond")
       const badgesJsonPath = taskArgs.badgesJson;
       const badges: BadgeData[] = require(`../${badgesJsonPath}`).badges;
 
+      const network = await hre.ethers.provider.getNetwork();
+      const chainId = network.chainId;
+
       console.log("badgesJson", badges);
 
       let signer: Signer;
@@ -79,7 +82,9 @@ task("addBadges", "Add new badges to the AGC Diamond")
         });
 
         signer = await hre.ethers.getSigner(owner);
-      } else if (hre.network.name === "matic" || hre.network.name === "amoy") {
+      }
+      //matic, amoy, polter
+      else if (chainId === 137 || chainId === 80002 || chainId === 631571) {
         signer = (await hre.ethers.getSigners())[0];
       } else {
         throw Error("Incorrect network selected");

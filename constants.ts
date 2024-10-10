@@ -19,12 +19,22 @@ const hardhatAddresses = {
   AGC_ADDRESS: "0xBf757a8A1Cf10F2c6D9f591eDF00E6ce4F22D249",
 };
 
+const polterAddresses = {
+  FUD_ADDRESS: "0x3C3a6c106A4BF3859be474c1ee5E3Df25e38f052",
+  FOMO_ADDRESS: "0xF66B88D03f284A21b9e1051de6cc8aEC5cac8893",
+  ALPHA_ADDRESS: "0x3F791E8fbDEF7475f44e70f0eb4bEc89636aAdC8",
+  KEK_ADDRESS: "0x3236D1bf08927BE6303717bB4651F694A3472eB6",
+  GLTR_ADDRESS: "0x2028b4043e6722Ea164946c82fe806c4a43a0fF4",
+  AGC_ADDRESS: "0x2a9e7A2A9FeD4A83F59125cFf72761E467cEa419",
+};
+
 export const itemManagerHw = "0x8D46fd7160940d89dA026D59B2e819208E714E82";
 
 export const networkAddresses: { [key: string]: { [key: string]: string } } = {
   137: maticAddresses,
   80002: amoyAddresses,
   31337: hardhatAddresses,
+  631571: polterAddresses,
 };
 
 export const defaultWheelWeights = [4500, 2300, 1600, 800, 250, 50, 500];
