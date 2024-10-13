@@ -16,7 +16,22 @@ const config: HardhatUserConfig = {
     externalArtifacts: ["externalArtifacts/*.json"], // optional array of glob patterns with external artifacts to process (for example external libs from node_modules)
     dontOverrideCompile: false, // defaults to false
   },
-  solidity: "0.8.18",
+  solidity: {
+    compilers: [
+      {
+        version: "0.8.18",
+        settings: {
+          optimizer: { enabled: true, runs: 200 },
+        },
+      },
+      {
+        version: "0.8.20",
+        settings: {
+          optimizer: { enabled: true, runs: 200 },
+        },
+      },
+    ],
+  },
 };
 
 export default config;

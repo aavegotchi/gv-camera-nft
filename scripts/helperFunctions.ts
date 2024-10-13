@@ -205,7 +205,7 @@ export async function cutDiamond(
   diamondAddress: string,
   FacetNames: string[],
   ethers: any,
-  diamondInit: DiamondInit,
+  diamondInit: any,
   showDiamondCut: boolean = false
 ) {
   const cut: IDiamondCut.FacetCutStruct[] = [];
@@ -217,7 +217,7 @@ export async function cutDiamond(
 
     const Facet = await ethers.getContractFactory(FacetName);
     const facet = await Facet.deploy();
-    await facet.deployed();
+    await facet.waitForDeployment();
     console.log(`${FacetName} deployed: ${facet.address}`);
 
     const selectors = getSelectors(facet);
