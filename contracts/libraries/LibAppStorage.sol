@@ -4,50 +4,23 @@ pragma solidity ^0.8.1;
 import {LibDiamond} from "./LibDiamond.sol";
 
 library LibAppStorage {
-    struct Game {
-        uint256 gameId;
-        string gameTitle;
-        string gameDescription;
-        uint256 lastUpdated;
-    }
-
-    struct Badge {
-        uint256 id;
-        string badgeId; //unique id for backend use
-        uint256 rarity;
-        uint256 gameId;
-        string title;
-        string description;
-        uint256 earnedOn;
-        uint256 count;
+    struct Photo {
+        uint256 tokenId; //might not need this
+        address owner;
+        string category;
+        string collectionName;
+        string seriesName;
+        string photoId;
+        string photographer;
+        address photographerAddress;
         string imageUrl;
+        uint256 mintedOn;
     }
 
     struct AppStorage {
-        //Aavegotchi Gaming Console
-        mapping(address => bool) agcAdmins;
-        address gpDiamond;
-        mapping(address => uint256) userToAGCPoints;
-        Game[] games;
-        mapping(uint256 => Game) idToGame;
-        Badge[] badges;
-        //
-        //GOTCHI Points
-        //
-        address agcDiamond;
-        address fudContract;
-        address fomoContract;
-        address alphaContract;
-        address kekContract;
-        uint256 currentSeason;
-        mapping(uint256 => uint256) seasonToMaxPoints;
-        mapping(address => uint256) userToSpinsRemaining;
-        mapping(uint256 => uint256) seasonPoints;
-        mapping(address => uint256) userToGotchiPoints;
-        mapping(address => uint256) tokenToConversionRate;
-        uint256[] wheelPoints; // 0 - 50000
-        uint256[] wheelWeights; // 0 - 100
-        mapping(address => uint256) userToSpins;
+        address minter;
+        Photo[] photos;
+        uint256 royaltyPercentage;
     }
 
     function diamondStorage() internal pure returns (AppStorage storage ds) {
@@ -63,15 +36,10 @@ contract Modifiers {
         _;
     }
 
-    modifier onlyAGCAdmin() {
-        require(LibAppStorage.diamondStorage().agcAdmins[msg.sender], "LibDiamond: Must be AGC admin");
-        _;
-    }
-
-    modifier onlyAGCAdminOrContractOwner() {
+    modifier onlyMinterOrContractOwner() {
         require(
-            msg.sender == LibDiamond.contractOwner() || LibAppStorage.diamondStorage().agcAdmins[msg.sender],
-            "LibDiamond: Must be AGC admin or contract owner"
+            msg.sender == LibAppStorage.diamondStorage().minter || msg.sender == LibDiamond.contractOwner(),
+            "LibAppStorage: Must be minter or contract owner"
         );
         _;
     }

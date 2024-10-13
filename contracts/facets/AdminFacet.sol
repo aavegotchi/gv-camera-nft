@@ -1,40 +1,20 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.1;
 
+pragma solidity ^0.8.18;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/utils/Base64.sol";
 import {LibAppStorage, Modifiers} from "../libraries/LibAppStorage.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract AdminFacet is Modifiers {
-    event AGCAdminStatusChanged(address indexed admin, bool isAdmin);
-
-    function setAGCAdmin(address _admin, bool _isAdmin) external onlyContractOwner {
+    function setRoyaltyPercentage(uint256 _royaltyPercentage) external onlyContractOwner {
         LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
-        ds.agcAdmins[_admin] = _isAdmin;
-        emit AGCAdminStatusChanged(_admin, _isAdmin);
+        ds.royaltyPercentage = _royaltyPercentage;
     }
 
-    function setAGCAdminsBatch(address[] calldata _admins, bool[] calldata _isAdmins) external onlyContractOwner {
-        require(_admins.length == _isAdmins.length, "AdminFacet: Input arrays must have the same length");
-
+    function getRoyaltyPercentage() external view returns (uint256) {
         LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
-
-        for (uint256 i = 0; i < _admins.length; i++) {
-            ds.agcAdmins[_admins[i]] = _isAdmins[i];
-            emit AGCAdminStatusChanged(_admins[i], _isAdmins[i]);
-        }
-    }
-
-    function setGPDiamond(address _gpDiamond) external onlyContractOwner {
-        LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
-        ds.gpDiamond = _gpDiamond;
-    }
-
-    function gpDiamond() external view returns (address) {
-        LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
-        return ds.gpDiamond;
-    }
-
-    function isAGCAdmin(address _admin) external view returns (bool) {
-        LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
-        return ds.agcAdmins[_admin];
+        return ds.royaltyPercentage;
     }
 }

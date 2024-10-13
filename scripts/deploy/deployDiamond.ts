@@ -1,17 +1,10 @@
 /* global ethers */
 /* eslint prefer-const: "off" */
 
-import { ethers, network } from "hardhat";
+import { ethers } from "hardhat";
 import { cutDiamond } from "../helperFunctions";
-import {
-  defaultWheelPoints,
-  defaultWheelWeights,
-  initialSeasonPoints,
-  initialTokenConversionRates,
-  networkAddresses,
-} from "../../constants";
 
-export async function deployAGCDiamond() {
+export async function deployDiamond() {
   const accounts = await ethers.getSigners();
   const contractOwner = accounts[0];
 
@@ -21,60 +14,12 @@ export async function deployAGCDiamond() {
   await diamondCutFacet.deployed();
   console.log("DiamondCutFacet deployed:", diamondCutFacet.address);
 
-  const testAdmins = [
-    contractOwner.address,
-    "0xbCDe4ef0E8b16C1b691EF552FA4BBD98560b991b",
-    "0xAd0CEb6Dc055477b8a737B630D6210EFa76a2265",
-    "0x1091232c61EeE86418DC93a5c895db3490386501",
-  ];
-
-  const realAdmins = [contractOwner.address];
-
-  let fud, fomo, alpha, kek;
-
-  const network = await ethers.provider.getNetwork();
-  console.log("Current network: ", network.name);
-
-  const chainId = await network.chainId;
-
-  if (chainId === 31337) {
-    //deploy alchemica on local testnet
-    const Alchemica = await ethers.getContractFactory("Alchemica");
-    fud = (await Alchemica.deploy("Fud", "FUD")).address;
-    fomo = (await Alchemica.deploy("Fomo", "FOMO")).address;
-    alpha = (await Alchemica.deploy("Alpha", "ALPHA")).address;
-    kek = (await Alchemica.deploy("Kek", "KEK")).address;
-
-    console.log("Fud deployed: ", fud);
-    console.log("Fomo deployed: ", fomo);
-    console.log("Alpha deployed: ", alpha);
-    console.log("Kek deployed: ", kek);
-  } else {
-    console.log("use existing alchemica");
-    fud = networkAddresses[chainId].FUD_ADDRESS;
-    fomo = networkAddresses[chainId].FOMO_ADDRESS;
-    alpha = networkAddresses[chainId].ALPHA_ADDRESS;
-    kek = networkAddresses[chainId].KEK_ADDRESS;
-  }
-
   // deploy Diamond
-  const Diamond = await ethers.getContractFactory("AGCDiamond");
+  const Diamond = await ethers.getContractFactory("Diamond");
   const diamond = await Diamond.deploy(
     contractOwner.address,
     diamondCutFacet.address,
-    ["unknown", "hardhat", "amoy"].includes(network.name)
-      ? testAdmins
-      : realAdmins,
-
-    //gotchi points
-    fud,
-    fomo,
-    alpha,
-    kek,
-    initialSeasonPoints, //1,000,000,000
-    defaultWheelWeights,
-    defaultWheelPoints,
-    initialTokenConversionRates
+    1000 // royalty percentage is out of 10000, so 10%
   );
   await diamond.deployed();
   console.log("Diamond deployed:", diamond.address);
@@ -93,12 +38,8 @@ export async function deployAGCDiamond() {
   const FacetNames = [
     "DiamondLoupeFacet",
     "OwnershipFacet",
-    "PointsFacet",
+    "NFTFacet",
     "AdminFacet",
-    "GamesFacet",
-    "BadgeFacet",
-    "GotchiPointsFacet",
-    "WheelFacet",
   ];
 
   await cutDiamond(diamond.address, FacetNames, ethers, diamondInit);
@@ -109,7 +50,7 @@ export async function deployAGCDiamond() {
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 if (require.main === module) {
-  deployAGCDiamond()
+  deployDiamond()
     .then(() => process.exit(0))
     .catch((error) => {
       console.error(error);
@@ -117,4 +58,4 @@ if (require.main === module) {
     });
 }
 
-exports.deployAGCDiamond = deployAGCDiamond;
+exports.deployDiamond = deployDiamond;

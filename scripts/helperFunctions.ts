@@ -243,7 +243,11 @@ export async function cutDiamond(
 
   // upgrade diamond with facets
   console.log("");
-  console.log("Diamond Cut:", cut);
+
+  if (showDiamondCut) {
+    console.log("Diamond Cut:", cut);
+  }
+
   const diamondCut = await ethers.getContractAt("IDiamondCut", diamondAddress);
   let tx;
   let receipt;

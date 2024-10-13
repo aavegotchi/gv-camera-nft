@@ -2,6 +2,7 @@
 import "@nomiclabs/hardhat-ethers";
 import "@nomicfoundation/hardhat-chai-matchers";
 import "@typechain/hardhat";
+import "solidity-coverage";
 
 require("./tasks/deployUpgrade.ts");
 require("./tasks/generateDiamondABI");
