@@ -5,7 +5,7 @@ import {LibDiamond} from "./LibDiamond.sol";
 
 library LibAppStorage {
     struct Photo {
-        uint256 tokenId; //might not need this
+        uint256 tokenId;
         address owner;
         string category;
         string collectionName;

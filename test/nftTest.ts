@@ -252,6 +252,21 @@ describe("DiamondTest", async function () {
       expect(decodedJSON.name).to.equal("category1");
       expect(decodedJSON.description).to.equal("collection1");
       expect(decodedJSON.attributes[0].value).to.equal("series1");
+      expect(decodedJSON.attributes[1].value).to.equal("photographer1");
+      expect(decodedJSON.attributes[2].value).to.equal("photo1");
+
+      // The timestamp in the contract is stored as a Unix timestamp (seconds since epoch)
+      // We need to convert it to a comparable format
+      const mintedOnTimestamp = parseInt(decodedJSON.attributes[3].value);
+      const mintedOnDate = new Date(mintedOnTimestamp * 1000); // Convert seconds to milliseconds
+
+      // Allow for a small time difference (e.g., 5 seconds) to account for block time variations
+      const currentDate = new Date();
+      const timeDifference = Math.abs(
+        currentDate.getTime() - mintedOnDate.getTime()
+      );
+
+      expect(timeDifference).to.be.lessThan(10000); // 10 seconds
       expect(decodedJSON.image).to.include("https://arweave.net/imageUrl1");
     });
 

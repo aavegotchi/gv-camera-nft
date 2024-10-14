@@ -89,12 +89,6 @@ contract NFTFacet is ERC721, Modifiers {
         }
     }
 
-    // function royaltyInfo(uint256 _tokenId, uint256 _salePrice) external view returns (address receiver, uint256 royaltyAmount) {
-    //     LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
-
-    //     return (ds.photos[_tokenId].photographerAddress, (_salePrice * ds.royaltyPercentage) / 10000);
-    // }
-
     function getPhotos(uint256[] memory _photoIds) external view returns (LibAppStorage.Photo[] memory) {
         LibAppStorage.AppStorage storage ds = LibAppStorage.diamondStorage();
 
@@ -123,28 +117,46 @@ contract NFTFacet is ERC721, Modifiers {
 
         LibAppStorage.Photo memory photo = ds.photos[_tokenId];
 
+        string memory json = _generateJsonString(photo, _tokenId);
+        bytes memory encodedJson = bytes(json);
+        return string(abi.encodePacked("data:application/json;base64,", Base64.encode(encodedJson)));
+    }
+
+    function _generateJsonString(LibAppStorage.Photo memory photo, uint256 _tokenId) private pure returns (string memory) {
         return
             string(
                 abi.encodePacked(
-                    "data:application/json;base64,",
-                    Base64.encode(
-                        bytes(
-                            abi.encodePacked(
-                                '{"name":"',
-                                photo.category,
-                                '", "description":"',
-                                photo.collectionName,
-                                '", "attributes": [{"trait_type": "Series Name", "value": "',
-                                photo.seriesName,
-                                '"}], "id":"',
-                                Strings.toString(_tokenId),
-                                '", "image":"',
-                                //aws url
-                                string(abi.encodePacked("https://arweave.net/", photo.imageUrl)),
-                                '"}'
-                            )
-                        )
-                    )
+                    '{"name":"',
+                    photo.category,
+                    '", "description":"',
+                    photo.collectionName,
+                    '", "attributes": [',
+                    _generateAttributes(photo),
+                    '], "id":"',
+                    Strings.toString(_tokenId),
+                    '", "image":"https://arweave.net/',
+                    photo.imageUrl,
+                    '"}'
+                )
+            );
+    }
+
+    function _generateAttributes(LibAppStorage.Photo memory photo) private pure returns (string memory) {
+        return
+            string(
+                abi.encodePacked(
+                    '{"trait_type": "Series Name", "value": "',
+                    photo.seriesName,
+                    '"}, ',
+                    '{"trait_type": "Photographer", "value": "',
+                    photo.photographer,
+                    '"}, ',
+                    '{"trait_type": "Photo ID", "value": "',
+                    photo.photoId,
+                    '"}, ',
+                    '{"trait_type": "Minted On", "value": "',
+                    Strings.toString(photo.mintedOn),
+                    '"}'
                 )
             );
     }
