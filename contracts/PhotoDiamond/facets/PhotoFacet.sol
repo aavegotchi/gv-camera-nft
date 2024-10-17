@@ -46,7 +46,6 @@ contract PhotoFacet is ERC721Upgradeable, Modifiers, IBaazaarCategory {
 
     function mintPhotoToOwner(
         address _to,
-        string memory _category, //gotchiverse
         string memory _collectionName, //photos
         string memory _seriesName, //launch day
         string memory _photoId, //0001-xxxx
@@ -61,7 +60,7 @@ contract PhotoFacet is ERC721Upgradeable, Modifiers, IBaazaarCategory {
             LibAppStoragePhoto.Photo({
                 tokenId: newId,
                 owner: _to,
-                category: _category,
+                category: "gotchiverse",
                 collectionName: _collectionName,
                 seriesName: _seriesName,
                 photoId: _photoId,
@@ -74,13 +73,12 @@ contract PhotoFacet is ERC721Upgradeable, Modifiers, IBaazaarCategory {
 
         _mint(_to, newId);
 
-        emit PhotoMinted(_to, newId, _category, _collectionName, _seriesName, _photoId, _photographer, _photographerAddress, _imageUrl);
+        emit PhotoMinted(_to, newId, "gotchiverse", _collectionName, _seriesName, _photoId, _photographer, _photographerAddress, _imageUrl);
         return newId;
     }
 
     function batchMintPhotos(
         address[] memory _tos,
-        string[] memory _categories,
         string[] memory _collectionNames,
         string[] memory _seriesNames,
         string[] memory _photoIds,
@@ -89,8 +87,7 @@ contract PhotoFacet is ERC721Upgradeable, Modifiers, IBaazaarCategory {
         string[] memory _imageUrls
     ) external onlyMinterOrContractOwner {
         require(
-            _categories.length == _collectionNames.length &&
-                _collectionNames.length == _seriesNames.length &&
+            _collectionNames.length == _seriesNames.length &&
                 _seriesNames.length == _photoIds.length &&
                 _photoIds.length == _photographers.length &&
                 _photographers.length == _imageUrls.length,
@@ -100,7 +97,6 @@ contract PhotoFacet is ERC721Upgradeable, Modifiers, IBaazaarCategory {
         for (uint256 i = 0; i < _tos.length; i++) {
             mintPhotoToOwner(
                 _tos[i],
-                _categories[i],
                 _collectionNames[i],
                 _seriesNames[i],
                 _photoIds[i],

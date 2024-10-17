@@ -1,16 +1,16 @@
 import { run } from "hardhat";
 
-async function generateABI_AGC() {
+async function generatePostcardABI() {
   await run("diamondABI", {
-    basePath: "/contracts/facets/",
+    basePath: "/contracts/PhotoDiamond/facets/",
     libraryBasePath: "/contracts/libraries/",
-    exportPath: "./diamondABI/diamond.json",
+    exportPath: "./diamondABI/diamondPostcard.json",
     removeTupleArrays: "true",
   });
 }
 
 if (require.main === module) {
-  generateABI_AGC()
+  generatePostcardABI()
     .then(() => process.exit(0))
     .catch((error) => {
       console.error(error);
@@ -18,4 +18,4 @@ if (require.main === module) {
     });
 }
 
-export { generateABI_AGC };
+export { generatePostcardABI };

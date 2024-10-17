@@ -116,7 +116,6 @@ describe("DiamondTest", async function () {
     it("should mint a photo to owner", async function () {
       const tx = await photoFacet.mintPhotoToOwner(
         user1.address,
-        "category1",
         "collection1",
         "series1",
         "photo1",
@@ -134,7 +133,7 @@ describe("DiamondTest", async function () {
       expect(event).to.not.be.undefined;
       expect(event?.args?.owner).to.equal(user1.address);
       expect(event?.args?.tokenId).to.equal(0);
-      expect(event?.args?.category).to.equal("category1");
+      expect(event?.args?.category).to.equal("gotchiverse");
       expect(event?.args?.collectionName).to.equal("collection1");
       expect(event?.args?.seriesName).to.equal("series1");
       expect(event?.args?.photoId).to.equal("photo1");
@@ -146,7 +145,6 @@ describe("DiamondTest", async function () {
     it("should batch mint photos", async function () {
       const tx = await photoFacet.batchMintPhotos(
         [user1.address, user2.address],
-        ["category1", "category2"],
         ["collection1", "collection2"],
         ["series1", "series2"],
         ["photo1", "photo2"],
@@ -180,7 +178,6 @@ describe("DiamondTest", async function () {
     it("should return correct royalty info", async function () {
       await photoFacet.mintPhotoToOwner(
         user1.address,
-        "category1",
         "collection1",
         "series1",
         "photo1",
@@ -209,7 +206,6 @@ describe("DiamondTest", async function () {
     it("should get photos", async function () {
       await photoFacet.mintPhotoToOwner(
         user1.address,
-        "category1",
         "collection1",
         "series1",
         "photo1",
@@ -235,7 +231,6 @@ describe("DiamondTest", async function () {
     it("should get photos length", async function () {
       await photoFacet.mintPhotoToOwner(
         user1.address,
-        "category1",
         "collection1",
         "series1",
         "photo1",
@@ -254,7 +249,6 @@ describe("DiamondTest", async function () {
     it("should return correct token URI", async function () {
       await photoFacet.mintPhotoToOwner(
         user1.address,
-        "category1",
         "collection1",
         "series1",
         "photo1",
@@ -270,7 +264,9 @@ describe("DiamondTest", async function () {
       expect(tokenURI).to.include("data:application/json;base64,");
 
       const decodedJSON = JSON.parse(atob(tokenURI.split(",")[1]));
-      expect(decodedJSON.name).to.equal("category1");
+
+      // expect(decodedJSON.category).to.equal("gotchiverse");
+      expect(decodedJSON.name).to.equal("gotchiverse");
       expect(decodedJSON.description).to.equal("collection1");
       expect(decodedJSON.attributes[0].value).to.equal("series1");
       expect(decodedJSON.attributes[1].value).to.equal("photographer1");
@@ -328,7 +324,6 @@ describe("DiamondTest", async function () {
     it("minter can mint", async function () {
       const tx = await photoFacet.mintPhotoToOwner(
         user1.address,
-        "category1",
         "collection1",
         "series1",
         "photo1",
@@ -350,7 +345,6 @@ describe("DiamondTest", async function () {
       await expect(
         photoFacet.mintPhotoToOwner(
           user1.address,
-          "category1",
           "collection1",
           "series1",
           "photo1",

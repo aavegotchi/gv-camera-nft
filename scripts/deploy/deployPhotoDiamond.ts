@@ -7,7 +7,9 @@ import { cutDiamond } from "../helperFunctions";
 export async function deployPhotoDiamond() {
   const accounts = await ethers.getSigners();
   const contractOwner = accounts[0];
-  const minter = accounts[1];
+  const minterAddress = "0x787e1cb3D9A1ce76427C4021484d527612F68532";
+
+  const contractOwnerAddress = await contractOwner.getAddress();
 
   // deploy DiamondCutFacet
   const DiamondCutFacet = await ethers.getContractFactory("DiamondCutFacet");
@@ -18,10 +20,10 @@ export async function deployPhotoDiamond() {
   // deploy Diamond
   const Diamond = await ethers.getContractFactory("PhotoDiamond");
   const diamond = await Diamond.deploy(
-    contractOwner.address,
+    contractOwnerAddress,
     diamondCutFacet.address,
     300, // royalty percentage is out of 10000, so 3%
-    [minter.address]
+    [minterAddress]
   );
   await diamond.deployed();
   console.log("Diamond deployed:", diamond.address);
