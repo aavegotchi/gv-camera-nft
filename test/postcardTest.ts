@@ -7,6 +7,7 @@ import {
   DiamondCutFacet,
   DiamondLoupeFacet,
   OwnershipFacet,
+  PostcardFacet,
 } from "../src/types";
 import { deployPostcardDiamond } from "../scripts/deploy/deployPostcardDiamond";
 
@@ -15,8 +16,7 @@ describe("DiamondTest", async function () {
   let diamondCutFacet: DiamondCutFacet;
   let diamondLoupeFacet: DiamondLoupeFacet;
   let ownershipFacet: OwnershipFacet;
-  let nftFacet: NFTFacet;
-  let adminFacet: AdminFacet;
+  let postcardFacet: PostcardFacet;
   let result;
   const addresses: string[] = [];
   let owner: any;
@@ -48,7 +48,7 @@ describe("DiamondTest", async function () {
       addresses.push(address);
     }
     console.log({ addresses });
-    assert.equal(addresses.length, 5);
+    assert.equal(addresses.length, 4);
   });
 
   it("facets should have the right function selectors -- call to facetFunctionSelectors function", async () => {
@@ -83,53 +83,67 @@ describe("DiamondTest", async function () {
     );
   });
 
-  describe("NFTFacet", async function () {
+  describe("postcardFacet", async function () {
     beforeEach(async function () {
       [owner, user1, user2] = await ethers.getSigners();
-      nftFacet = await ethers.getContractAt("NFTFacet", diamondAddress);
-      adminFacet = await ethers.getContractAt("AdminFacet", diamondAddress);
+      postcardFacet = await ethers.getContractAt(
+        "PostcardFacet",
+        diamondAddress
+      );
+    });
+
+    it("admin should add a postcard", async function () {
+      const tx = await postcardFacet.adminAddPostcard(
+        "collection1",
+        "series1",
+        "description1",
+        "imageUrl1"
+      );
+
+      const receipt = await tx.wait();
+
+      const event = receipt.events?.find((e: any) => e.event === "AddPostCard");
+
+      expect(event).to.not.be.undefined;
+      expect(event?.args?.collectionName).to.equal("collection1");
+      expect(event?.args?.seriesName).to.equal("series1");
+      expect(event?.args?.description).to.equal("description1");
+      expect(event?.args?.imageUrl).to.equal("imageUrl1");
+    });
+
+    it("non admin should not be able to add a postcard", async function () {
+      await expect(
+        postcardFacet
+          .connect(user1)
+          .adminAddPostcard(
+            "collection1",
+            "series1",
+            "description1",
+            "imageUrl1"
+          )
+      ).to.be.reverted;
     });
 
     it("should mint a photo to owner", async function () {
-      const tx = await nftFacet.mintPhotoToOwner(
-        user1.address,
-        "category1",
-        "collection1",
-        "series1",
-        "photo1",
-        "photographer1",
-        "imageUrl1",
-        user2.address
-      );
-
+      const tx = await postcardFacet.mintPostcardToOwner(user1.address, 0);
       user1Balance++;
 
       const receipt = await tx.wait();
 
-      const event = receipt.events?.find((e: any) => e.event === "PhotoMinted");
+      const event = receipt.events?.find(
+        (e: any) => e.event === "PostcardMinted"
+      );
 
       expect(event).to.not.be.undefined;
       expect(event?.args?.owner).to.equal(user1.address);
       expect(event?.args?.tokenId).to.equal(0);
-      expect(event?.args?.category).to.equal("category1");
-      expect(event?.args?.collectionName).to.equal("collection1");
-      expect(event?.args?.seriesName).to.equal("series1");
-      expect(event?.args?.photoId).to.equal("photo1");
-      expect(event?.args?.photographer).to.equal("photographer1");
-      expect(event?.args?.photographerAddress).to.equal(user2.address);
-      expect(event?.args?.imageUrl).to.equal("imageUrl1");
+      expect(event?.args?.quantity).to.equal(1);
     });
 
     it("should batch mint photos", async function () {
-      const tx = await nftFacet.batchMintPhotos(
+      const tx = await postcardFacet.batchMintPostcards(
         [user1.address, user2.address],
-        ["category1", "category2"],
-        ["collection1", "collection2"],
-        ["series1", "series2"],
-        ["photo1", "photo2"],
-        ["photographer1", "photographer2"],
-        [user1.address, user2.address],
-        ["imageUrl1", "imageUrl2"]
+        [0, 1]
       );
 
       user1Balance++;
@@ -137,7 +151,7 @@ describe("DiamondTest", async function () {
 
       const receipt = await tx.wait();
       const events = receipt.events?.filter(
-        (e: any) => e.event === "PhotoMinted"
+        (e: any) => e.event === "PostcardMinted"
       );
 
       expect(events?.length).to.equal(2);
@@ -154,108 +168,55 @@ describe("DiamondTest", async function () {
       expect(isEIP2981).to.be.true;
     });
 
-    it("should return correct royalty info", async function () {
-      await nftFacet.mintPhotoToOwner(
-        user1.address,
-        "category1",
-        "collection1",
-        "series1",
-        "photo1",
-        "photographer1",
-        "imageUrl1",
-        user2.address
-      );
-
-      const royaltyPercentage = await adminFacet.getRoyaltyPercentage();
-
-      const salePrice = ethers.utils.parseEther("1");
-
-      const [receiver, royaltyAmount] = await nftFacet.royaltyInfo(
-        0,
-        salePrice
-      );
-
-      const expectedRoyaltyAmount = salePrice.mul(royaltyPercentage).div(10000);
-
-      expect(receiver).to.equal(user2.address);
-      expect(royaltyAmount).to.equal(expectedRoyaltyAmount);
-
-      user1Balance++;
-    });
-
     it("should get photos", async function () {
-      await nftFacet.mintPhotoToOwner(
-        user1.address,
-        "category1",
-        "collection1",
-        "series1",
-        "photo1",
-        "photographer1",
-        "imageUrl1",
-        user2.address
-      );
+      await postcardFacet.mintPostcardToOwner(user1.address, 0);
 
       user1Balance++;
 
-      const photos = await nftFacet.getPhotos([0]);
+      const photos = await postcardFacet.getPostcards([0]);
 
       expect(photos.length).to.equal(1);
       expect(photos[0].tokenId).to.equal(0);
-      expect(photos[0].owner).to.equal(user1.address);
     });
 
     it("should get all photos", async function () {
-      const photos = await nftFacet.getPhotos([]);
-      expect(photos.length).to.equal(user1Balance + user2Balance);
+      const postcards = await postcardFacet.getPostcards([]);
+      expect(postcards.length).to.equal(1);
     });
 
-    it("should get photos length", async function () {
-      await nftFacet.mintPhotoToOwner(
-        user1.address,
-        "category1",
-        "collection1",
-        "series1",
-        "photo1",
-        "photographer1",
-        "imageUrl1",
-        user2.address
-      );
-
+    it("should get postcards balance", async function () {
+      await postcardFacet.mintPostcardToOwner(user1.address, 0);
       user1Balance++;
 
-      const length = await nftFacet.getPhotosLength();
+      const balance = await postcardFacet.balanceOf(user1.address, 0);
 
-      expect(length.toNumber()).to.equal(user1Balance + user2Balance);
+      expect(balance.toNumber()).to.equal(user1Balance);
     });
 
     it("should return correct token URI", async function () {
-      await nftFacet.mintPhotoToOwner(
-        user1.address,
-        "category1",
-        "collection1",
-        "series1",
-        "photo1",
-        "photographer1",
-        "imageUrl1",
-        user2.address
-      );
+      await postcardFacet.mintPostcardToOwner(user1.address, 0);
 
       user1Balance++;
 
-      const tokenURI = await nftFacet.tokenURI(0);
+      const tokenURI = await postcardFacet.uri(0);
 
       expect(tokenURI).to.include("data:application/json;base64,");
 
       const decodedJSON = JSON.parse(atob(tokenURI.split(",")[1]));
-      expect(decodedJSON.name).to.equal("category1");
+      expect(decodedJSON.name).to.equal("gotchiverse");
       expect(decodedJSON.description).to.equal("collection1");
-      expect(decodedJSON.attributes[0].value).to.equal("series1");
-      expect(decodedJSON.attributes[1].value).to.equal("photographer1");
-      expect(decodedJSON.attributes[2].value).to.equal("photo1");
+      const attributes = decodedJSON.attributes;
+      expect(attributes).to.have.lengthOf(2);
+      expect(attributes[0]).to.deep.equal({
+        trait_type: "Series Name",
+        value: "series1",
+      });
+      expect(attributes[1]).to.have.property("trait_type", "Minted On");
+      expect(attributes[1]).to.have.property("value").that.is.a("string");
 
       // The timestamp in the contract is stored as a Unix timestamp (seconds since epoch)
       // We need to convert it to a comparable format
-      const mintedOnTimestamp = parseInt(decodedJSON.attributes[3].value);
+      const mintedOnTimestamp = parseInt(decodedJSON.attributes[1].value);
       const mintedOnDate = new Date(mintedOnTimestamp * 1000); // Convert seconds to milliseconds
 
       // Allow for a small time difference (e.g., 5 seconds) to account for block time variations
@@ -269,51 +230,32 @@ describe("DiamondTest", async function () {
     });
 
     it("nft balance of owner should be correct", async function () {
-      const balance = await nftFacet.balanceOf(user1.address);
+      const balance = await postcardFacet.balanceOf(user1.address, 0);
       expect(balance.toNumber()).to.equal(user1Balance);
     });
 
     it("owner cannot transfer nft without approval", async function () {
       await expect(
-        nftFacet
+        postcardFacet
           .connect(user2)
-          ["safeTransferFrom(address,address,uint256)"](
-            user1.address,
-            user2.address,
-            0
-          )
-      ).to.be.revertedWithCustomError(nftFacet, "ERC721InsufficientApproval");
+          .safeTransferFrom(user1.address, user2.address, 0, 1, [])
+      ).to.be.revertedWithCustomError(
+        postcardFacet,
+        "ERC1155MissingApprovalForAll"
+      );
     });
     it("only nft owner can transfer nft", async function () {
       await expect(
-        nftFacet
+        postcardFacet
           .connect(user1)
-          ["safeTransferFrom(address,address,uint256)"](
-            user1.address,
-            user2.address,
-            0
-          )
+          .safeTransferFrom(user1.address, user2.address, 0, 1, [])
       ).to.not.be.reverted;
 
       user1Balance--;
       user2Balance++;
 
-      const balance = await nftFacet.balanceOf(user2.address);
-      expect(balance.toNumber()).to.equal(user2Balance);
-    });
-  });
-
-  describe("AdminFacet", async function () {
-    it("should set royalty percentage", async function () {
-      const tx = await adminFacet.setRoyaltyPercentage(5000);
-      const receipt = await tx.wait();
-
-      const event = receipt.events?.find(
-        (e: any) => e.event === "RoyaltyPercentageUpdated"
-      );
-
-      const royaltyPercentage = await adminFacet.getRoyaltyPercentage();
-      expect(royaltyPercentage.toNumber()).to.equal(5000);
+      const balance = await postcardFacet.balanceOf(user1.address, 0);
+      expect(balance.toNumber()).to.equal(user1Balance);
     });
   });
 

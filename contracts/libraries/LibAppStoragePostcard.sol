@@ -5,6 +5,7 @@ import {LibDiamond} from "./LibDiamond.sol";
 
 library LibAppStoragePostcard {
     struct Postcard {
+        uint256 tokenId;
         string category;
         string collectionName;
         string seriesName;

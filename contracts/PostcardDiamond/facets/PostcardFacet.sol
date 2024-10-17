@@ -9,16 +9,9 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import {IBaazaarCategory} from "../../interfaces/IBaazaarCategory.sol";
 
 contract PostcardFacet is ERC1155Upgradeable, Modifiers, IBaazaarCategory {
-    event AddPostCard(
-        string postcardId,
-        string category,
-        string collectionName,
-        string postcardName,
-        string postcardDescription,
-        string postcardImageUrl
-    );
+    event AddPostCard(uint256 tokenId, string category, string collectionName, string seriesName, string description, string imageUrl);
 
-    event PostcardMinted(address indexed owner, uint256 seriesNumber, uint256 quantity);
+    event PostcardMinted(address indexed owner, uint256 tokenId, uint256 quantity);
 
     //OZ upgradeable impl
     //DO NOT CHANGE
@@ -39,7 +32,6 @@ contract PostcardFacet is ERC1155Upgradeable, Modifiers, IBaazaarCategory {
     }
 
     function adminAddPostcard(
-        string memory _category,
         string memory _collectionName,
         string memory _seriesName,
         string memory _description,
@@ -50,7 +42,8 @@ contract PostcardFacet is ERC1155Upgradeable, Modifiers, IBaazaarCategory {
 
         ds.postcards.push(
             LibAppStoragePostcard.Postcard({
-                category: _category,
+                tokenId: newId,
+                category: "gotchiverse",
                 collectionName: _collectionName,
                 seriesName: _seriesName,
                 seriesNumber: newId,
@@ -59,21 +52,20 @@ contract PostcardFacet is ERC1155Upgradeable, Modifiers, IBaazaarCategory {
                 mintedOn: block.timestamp
             })
         );
+
+        emit AddPostCard(newId, "gotchiverse", _collectionName, _seriesName, _description, _imageUrl);
     }
 
-    function mintPostcardToOwner(
-        address _to,
-        uint256 _seriesNumber //1
-    ) public onlyMinterOrContractOwner {
-        _mint(_to, _seriesNumber, 1, "");
-        emit PostcardMinted(_to, _seriesNumber, 1);
+    function mintPostcardToOwner(address _to, uint256 _tokenId) public onlyMinterOrContractOwner {
+        _mint(_to, _tokenId, 1, "");
+        emit PostcardMinted(_to, _tokenId, 1);
     }
 
-    function batchMintPostcards(address[] memory _tos, uint256[] memory _seriesNumbers) external onlyMinterOrContractOwner {
-        require(_seriesNumbers.length == _tos.length, "Input arrays must have the same length");
+    function batchMintPostcards(address[] memory _tos, uint256[] memory _tokenIds) external onlyMinterOrContractOwner {
+        require(_tokenIds.length == _tos.length, "Input arrays must have the same length");
 
         for (uint256 i = 0; i < _tos.length; i++) {
-            mintPostcardToOwner(_tos[i], _seriesNumbers[i]);
+            mintPostcardToOwner(_tos[i], _tokenIds[i]);
         }
     }
 
