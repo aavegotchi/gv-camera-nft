@@ -2,7 +2,7 @@ import { run } from "hardhat";
 
 async function generatePostcardABI() {
   await run("diamondABI", {
-    basePath: "/contracts/PhotoDiamond/facets/",
+    basePath: "/contracts/PostcardDiamond/facets/",
     libraryBasePath: "/contracts/libraries/",
     exportPath: "./diamondABI/diamondPostcard.json",
     removeTupleArrays: "true",
