@@ -85,13 +85,31 @@ describe("DiamondTest", async function () {
     );
   });
 
-  describe("NFTFacet", async function () {
+  describe("PhotoFacet", async function () {
     beforeEach(async function () {
       [owner, user1, user2] = await ethers.getSigners();
       photoFacet = await ethers.getContractAt("PhotoFacet", diamondAddress);
       photoAdminFacet = await ethers.getContractAt(
         "PhotoAdminFacet",
         diamondAddress
+      );
+    });
+
+    it("should have correct name and symbol", async function () {
+      expect(await photoFacet.name()).to.equal("Gotchiverse Photos");
+      expect(await photoFacet.symbol()).to.equal("GVP");
+    });
+
+    it("should have baazaar category interface", async function () {
+      const isBaazaarCategory = await diamondLoupeFacet.supportsInterface(
+        "0x14f337dc"
+      );
+      expect(isBaazaarCategory).to.be.true;
+    });
+
+    it("should have correct baazaar category", async function () {
+      expect(await photoFacet.baazaarCategory(0)).to.equal(
+        "gotchiverse.photos"
       );
     });
 
@@ -305,6 +323,42 @@ describe("DiamondTest", async function () {
 
       const balance = await photoFacet.balanceOf(user2.address);
       expect(balance.toNumber()).to.equal(user2Balance);
+    });
+
+    it("minter can mint", async function () {
+      const tx = await photoFacet.mintPhotoToOwner(
+        user1.address,
+        "category1",
+        "collection1",
+        "series1",
+        "photo1",
+        "photographer1",
+        "imageUrl1",
+        user2.address
+      );
+
+      user1Balance++;
+    });
+
+    it("non minter cannot mint", async function () {
+      photoFacet = await ethers.getContractAt(
+        "PhotoFacet",
+        diamondAddress,
+        user2
+      );
+
+      await expect(
+        photoFacet.mintPhotoToOwner(
+          user1.address,
+          "category1",
+          "collection1",
+          "series1",
+          "photo1",
+          "photographer1",
+          "imageUrl1",
+          user2.address
+        )
+      ).to.be.reverted;
     });
   });
 

@@ -4,10 +4,8 @@ import { getSelectors } from "../scripts/libraries/diamond";
 import { assert, expect } from "chai";
 import { ethers } from "hardhat";
 import {
-  AdminFacet,
   DiamondCutFacet,
   DiamondLoupeFacet,
-  NFTFacet,
   OwnershipFacet,
 } from "../src/types";
 import { deployPostcardDiamond } from "../scripts/deploy/deployPostcardDiamond";

@@ -18,9 +18,9 @@ library LibAppStoragePhoto {
     }
 
     struct AppStorage {
-        address minter;
         Photo[] photos;
         uint256 royaltyPercentage;
+        mapping(address => bool) minters;
     }
 
     function diamondStorage() internal pure returns (AppStorage storage ds) {
@@ -38,7 +38,7 @@ contract Modifiers {
 
     modifier onlyMinterOrContractOwner() {
         require(
-            msg.sender == LibAppStoragePhoto.diamondStorage().minter || msg.sender == LibDiamond.contractOwner(),
+            LibAppStoragePhoto.diamondStorage().minters[msg.sender] || msg.sender == LibDiamond.contractOwner(),
             "LibAppStorage: Must be minter or contract owner"
         );
         _;

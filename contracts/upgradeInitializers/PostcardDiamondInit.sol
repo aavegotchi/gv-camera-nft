@@ -15,12 +15,13 @@ import {IERC173} from "../interfaces/IERC173.sol";
 import {IERC165} from "../interfaces/IERC165.sol";
 import {IERC721} from "@openzeppelin/contracts/interfaces/IERC721.sol";
 import {IERC2981} from "@openzeppelin/contracts/interfaces/IERC2981.sol";
+import {IBaazaarCategory} from "../interfaces/IBaazaarCategory.sol";
 
 // It is expected that this contract is customized if you want to deploy your diamond
 // with data from a deployment script. Use the init function to initialize state variables
 // of your diamond. Add parameters to the init function if you need to.
 
-contract DiamondInit {
+contract PostcardDiamondInit {
     // You can add parameters to this function in order to pass in
     // data to set your own state variables
     function init() external {
@@ -33,7 +34,7 @@ contract DiamondInit {
 
         ds.supportedInterfaces[type(IERC721).interfaceId] = true;
         ds.supportedInterfaces[type(IERC2981).interfaceId] = true;
-
+        ds.supportedInterfaces[type(IBaazaarCategory).interfaceId] = true;
         // add your own state variables
         // EIP-2535 specifies that the `diamondCut` function takes two optional
         // arguments: address _init and bytes calldata _calldata

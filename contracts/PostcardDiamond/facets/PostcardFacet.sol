@@ -2,12 +2,13 @@
 
 pragma solidity ^0.8.18;
 
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 import {LibAppStoragePostcard, Modifiers} from "../../libraries/LibAppStoragePostcard.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import {IBaazaarCategory} from "../../interfaces/IBaazaarCategory.sol";
 
-contract PostcardFacet is ERC1155, Modifiers {
+contract PostcardFacet is ERC1155Upgradeable, Modifiers, IBaazaarCategory {
     event AddPostCard(
         string postcardId,
         string category,
@@ -19,7 +20,23 @@ contract PostcardFacet is ERC1155, Modifiers {
 
     event PostcardMinted(address indexed owner, uint256 seriesNumber, uint256 quantity);
 
-    constructor() ERC1155("") {}
+    //OZ upgradeable impl
+    //DO NOT CHANGE
+    // keccak256(abi.encode(uint256(keccak256("openzeppelin.storage.ERC1155")) - 1)) & ~bytes32(uint256(0xff))
+    bytes32 private constant ERC1155StorageLocation = 0x88be536d5240c274a3b1d3a1be54482fd9caa294f08c62a7cde569f49a3c4500;
+
+    constructor() ERC1155Upgradeable() {
+        //we do a manual storage slot init because of oz modifiers
+        ERC1155Storage storage $;
+        assembly {
+            $.slot := ERC1155StorageLocation
+        }
+        $._uri = "";
+    }
+
+    function baazaarCategory(uint256 _tokenId) external pure returns (string memory) {
+        return "gotchiverse.postcards";
+    }
 
     function adminAddPostcard(
         string memory _category,

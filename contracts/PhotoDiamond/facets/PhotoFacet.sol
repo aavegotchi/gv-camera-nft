@@ -2,12 +2,13 @@
 
 pragma solidity ^0.8.18;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 import {LibAppStoragePhoto, Modifiers} from "../../libraries/LibAppStoragePhoto.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import {IBaazaarCategory} from "../../interfaces/IBaazaarCategory.sol";
 
-contract PhotoFacet is ERC721, Modifiers {
+contract PhotoFacet is ERC721Upgradeable, Modifiers, IBaazaarCategory {
     event PhotoMinted(
         address indexed owner,
         uint256 indexed tokenId,
@@ -20,7 +21,28 @@ contract PhotoFacet is ERC721, Modifiers {
         string imageUrl
     );
 
-    constructor() ERC721("Gotchiverse Photos", "GP") {}
+    //ERC721 OZ impl
+    bytes32 private constant ERC721StorageLocation = 0x80bb2b638cc20bc4d0a60d66940f3ab4a00c1d7b313497ca82fb0b4ab0079300;
+    constructor() {
+        ERC721Storage storage $;
+        assembly {
+            $.slot := ERC721StorageLocation
+        }
+        $._name = "Gotchiverse Photos";
+        $._symbol = "GVP";
+    }
+
+    function name() public pure override returns (string memory) {
+        return "Gotchiverse Photos";
+    }
+
+    function symbol() public pure override returns (string memory) {
+        return "GVP";
+    }
+
+    function baazaarCategory(uint256 _tokenId) external pure returns (string memory) {
+        return "gotchiverse.photos";
+    }
 
     function mintPhotoToOwner(
         address _to,

@@ -13,7 +13,7 @@ import {LibAppStoragePhoto} from "./libraries/LibAppStoragePhoto.sol";
 import {IDiamondCut} from "./interfaces/IDiamondCut.sol";
 
 contract PhotoDiamond {
-    constructor(address _contractOwner, address _diamondCutFacet, uint256 _royaltyPercentage) payable {
+    constructor(address _contractOwner, address _diamondCutFacet, uint256 _royaltyPercentage, address[] memory _minters) payable {
         LibDiamond.setContractOwner(_contractOwner);
 
         // Add the diamondCut external function from the diamondCutFacet
@@ -27,6 +27,10 @@ contract PhotoDiamond {
         LibAppStoragePhoto.AppStorage storage ds = LibAppStoragePhoto.diamondStorage();
 
         ds.royaltyPercentage = _royaltyPercentage;
+
+        for (uint256 i = 0; i < _minters.length; i++) {
+            ds.minters[_minters[i]] = true;
+        }
     }
 
     // Find facet for function that is called and execute the
