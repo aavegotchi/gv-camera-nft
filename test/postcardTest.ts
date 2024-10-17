@@ -7,6 +7,7 @@ import {
   DiamondCutFacet,
   DiamondLoupeFacet,
   OwnershipFacet,
+  PostcardAdminFacet,
   PostcardFacet,
 } from "../src/types";
 import { deployPostcardDiamond } from "../scripts/deploy/deployPostcardDiamond";
@@ -17,6 +18,7 @@ describe("DiamondTest", async function () {
   let diamondLoupeFacet: DiamondLoupeFacet;
   let ownershipFacet: OwnershipFacet;
   let postcardFacet: PostcardFacet;
+  let postcardAdminFacet: PostcardAdminFacet;
   let result;
   const addresses: string[] = [];
   let owner: any;
@@ -48,7 +50,7 @@ describe("DiamondTest", async function () {
       addresses.push(address);
     }
     console.log({ addresses });
-    assert.equal(addresses.length, 4);
+    assert.equal(addresses.length, 5);
   });
 
   it("facets should have the right function selectors -- call to facetFunctionSelectors function", async () => {
@@ -274,6 +276,53 @@ describe("DiamondTest", async function () {
 
       const newOwner = await ownershipFacet.owner();
       expect(newOwner).to.equal(user1.address);
+    });
+  });
+
+  describe("PostcardAdminFacet", async function () {
+    it("only owner can set minters", async function () {
+      postcardAdminFacet = await ethers.getContractAt(
+        "PostcardAdminFacet",
+        diamondAddress
+      );
+
+      await expect(
+        postcardAdminFacet.connect(user2).setMinters([user1.address])
+      ).to.be.revertedWith("LibDiamond: Must be contract owner");
+    });
+
+    it("owner can set minters", async function () {
+      postcardAdminFacet = await ethers.getContractAt(
+        "PostcardAdminFacet",
+        diamondAddress,
+        user1
+      );
+      await postcardAdminFacet.setMinters([user1.address]);
+
+      let minter = await postcardAdminFacet.isMinter(user1.address);
+      expect(minter).to.be.true;
+    });
+  });
+
+  describe("PostcardFacet 2", async function () {
+    it("only minter can mint", async function () {
+      await expect(
+        postcardFacet.connect(user2).mintPostcardToOwner(user1.address, 0)
+      ).to.be.revertedWith("LibAppStorage: Must be minter or contract owner");
+    });
+
+    it("minter can mint", async function () {
+      //add user2 as minter
+      postcardAdminFacet = await ethers.getContractAt(
+        "PostcardAdminFacet",
+        diamondAddress,
+        user1
+      );
+      await postcardAdminFacet.setMinters([user2.address]);
+
+      await expect(
+        postcardFacet.connect(user2).mintPostcardToOwner(user1.address, 0)
+      ).to.not.be.reverted;
     });
   });
 });

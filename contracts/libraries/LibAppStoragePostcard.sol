@@ -16,8 +16,8 @@ library LibAppStoragePostcard {
     }
 
     struct AppStorage {
-        address minter;
         Postcard[] postcards;
+        mapping(address => bool) minters;
     }
 
     function diamondStorage() internal pure returns (AppStorage storage ds) {
@@ -35,7 +35,7 @@ contract Modifiers {
 
     modifier onlyMinterOrContractOwner() {
         require(
-            msg.sender == LibAppStoragePostcard.diamondStorage().minter || msg.sender == LibDiamond.contractOwner(),
+            LibAppStoragePostcard.diamondStorage().minters[msg.sender] || msg.sender == LibDiamond.contractOwner(),
             "LibAppStorage: Must be minter or contract owner"
         );
         _;

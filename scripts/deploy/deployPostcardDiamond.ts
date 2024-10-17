@@ -34,7 +34,12 @@ export async function deployPostcardDiamond() {
   // deploy facets
   console.log("");
   console.log("Deploying facets");
-  const FacetNames = ["DiamondLoupeFacet", "OwnershipFacet", "PostcardFacet"];
+  const FacetNames = [
+    "DiamondLoupeFacet",
+    "OwnershipFacet",
+    "PostcardFacet",
+    "PostcardAdminFacet",
+  ];
 
   await cutDiamond(diamond.address, FacetNames, ethers, diamondInit);
 
