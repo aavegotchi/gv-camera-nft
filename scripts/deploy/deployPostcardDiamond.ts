@@ -4,7 +4,7 @@
 import { ethers } from "hardhat";
 import { cutDiamond } from "../helperFunctions";
 
-export async function deployDiamond() {
+export async function deployPostcardDiamond() {
   const accounts = await ethers.getSigners();
   const contractOwner = accounts[0];
 
@@ -15,11 +15,10 @@ export async function deployDiamond() {
   console.log("DiamondCutFacet deployed:", diamondCutFacet.address);
 
   // deploy Diamond
-  const Diamond = await ethers.getContractFactory("Diamond");
+  const Diamond = await ethers.getContractFactory("PostcardDiamond");
   const diamond = await Diamond.deploy(
     contractOwner.address,
-    diamondCutFacet.address,
-    1000 // royalty percentage is out of 10000, so 10%
+    diamondCutFacet.address
   );
   await diamond.deployed();
   console.log("Diamond deployed:", diamond.address);
@@ -50,7 +49,7 @@ export async function deployDiamond() {
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 if (require.main === module) {
-  deployDiamond()
+  deployPostcardDiamond()
     .then(() => process.exit(0))
     .catch((error) => {
       console.error(error);
@@ -58,4 +57,4 @@ if (require.main === module) {
     });
 }
 
-exports.deployDiamond = deployDiamond;
+exports.deployPostcardDiamond = deployPostcardDiamond;

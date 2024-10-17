@@ -3,7 +3,7 @@ pragma solidity ^0.8.1;
 
 import {LibDiamond} from "./LibDiamond.sol";
 
-library LibAppStorage {
+library LibAppStoragePhoto {
     struct Photo {
         uint256 tokenId;
         address owner;
@@ -38,7 +38,7 @@ contract Modifiers {
 
     modifier onlyMinterOrContractOwner() {
         require(
-            msg.sender == LibAppStorage.diamondStorage().minter || msg.sender == LibDiamond.contractOwner(),
+            msg.sender == LibAppStoragePhoto.diamondStorage().minter || msg.sender == LibDiamond.contractOwner(),
             "LibAppStorage: Must be minter or contract owner"
         );
         _;

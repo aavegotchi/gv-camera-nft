@@ -2,7 +2,7 @@
 /* eslint prefer-const: "off" */
 
 import { ethers } from "hardhat";
-import { deployAGCDiamond } from "./deployDiamond";
+import { deployAGCDiamond } from "./deployPhotoDiamond";
 import { uploadBadges } from "../chores/uploadBadges";
 
 export async function deployDiamonds() {

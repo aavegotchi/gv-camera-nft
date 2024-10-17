@@ -10,7 +10,7 @@ import {
   NFTFacet,
   OwnershipFacet,
 } from "../src/types";
-import { deployDiamond } from "../scripts/deploy/deployDiamond";
+import { deployPostcardDiamond } from "../scripts/deploy/deployPostcardDiamond";
 
 describe("DiamondTest", async function () {
   let diamondAddress: string;
@@ -29,7 +29,7 @@ describe("DiamondTest", async function () {
   let user2Balance: number = 0;
 
   before(async function () {
-    diamondAddress = await deployDiamond();
+    diamondAddress = await deployPostcardDiamond();
     console.log({ diamondAddress });
     diamondCutFacet = (await ethers.getContractAt(
       "DiamondCutFacet",
